@@ -1,0 +1,57 @@
+version: '3.3'
+
+services:
+  micro_investment_db:
+    restart: always
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "54035:5432"
+    networks:
+      - micro-investment-network
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  micro_investment_web:
+    restart: always
+    build: ./src
+    networks:
+      - micro-investment-network
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./src:/src
+      - ./src/micro_investment:/src/micro_investment
+      - ./src/static:/src/static
+      - ./src/media:/src/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    env_file:
+      - .env
+    depends_on:
+      - micro_investment_db
+volumes:
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+  static:
+    driver: local
+  media:
+    driver: local
+  web:
+    driver: local
+
+networks:
+  micro-investment-network:
+    driver: bridge
