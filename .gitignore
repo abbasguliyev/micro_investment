@@ -167,3 +167,6 @@ staticfiles
 staticfiles/
 /staticfiles/
 /staticfiles
+media
+/media/
+/media

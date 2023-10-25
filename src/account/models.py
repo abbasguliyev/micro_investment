@@ -1,14 +1,14 @@
-from collections.abc import Iterable
 import datetime
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 
+from phonenumber_field.modelfields import PhoneNumberField
 from micro_investment.validators import compress
-
 from account import enums
 
 class UserManager(BaseUserManager):
@@ -58,11 +58,11 @@ class Investor(models.Model):
     marital_status = models.CharField(_("Martial Status"), max_length=50, choices=enums.MartialStatus.choices, default=enums.MartialStatus.SINGLE)
     employment_status = models.CharField(_("Employment Status"), max_length=50, choices=enums.EmploymentStatus.choices, default=enums.EmploymentStatus.WORKING)
     housing_status = models.CharField(_("Housing Status"), max_length=50, choices=enums.HousingStatus.choices, default=enums.HousingStatus.OWN_HOME)
-    phone_number = models.CharField(_("Phone Number"), max_length=20)
+    phone_number = PhoneNumberField(verbose_name=_("Phone Number"), blank=True)
     credit_cart_number = models.CharField(_("Credit Cart Number"), max_length=100)
     debt_amount = models.DecimalField(_("Debt Amount"), max_digits=10, decimal_places=2, default=0)
     monthly_income = models.DecimalField(_("Monthly Income"), max_digits=10, decimal_places=2, default=0)
-    referances = models.ManyToManyField(User, related_name="investors", verbose_name=_("Referances"))
+    references = models.ManyToManyField(User, related_name="investors", verbose_name=_("References"), blank=True)
     profile_picture = models.ImageField(_("Profile Picture"), upload_to="investor/profile_pictures/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])
     about = models.TextField(_("about"), null=True, blank=True)
     business_activities = models.TextField(_("Business Activities"), null=True, blank=True)
@@ -92,4 +92,8 @@ class Experience(models.Model):
     start_year = models.PositiveIntegerField(('start_year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], default=datetime.datetime.now().year)
     end_year = models.PositiveIntegerField(('end_year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], null=True, blank=True)
     is_continue = models.BooleanField(default=False)
+
+class UserBalance(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="balance")
+    balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)
 

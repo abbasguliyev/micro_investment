@@ -40,6 +40,76 @@ services:
       - .env
     depends_on:
       - micro_investment_db
+  micro_investment_redis:
+    restart: always
+    image: redis
+    container_name: micro_investment_redis
+    user: root
+    command: redis-server --appendonly yes
+    networks:
+      - micro-investment-network
+    ports:
+      - "63080:6379"
+    env_file:
+      - .env
+    volumes:
+      - redis_data:/usr/local/etc/redis/redis.conf
+    environment:
+     - REDIS_HOST=${REDIS_HOST}
+     - REDIS_PORT=${REDIS_PORT}
+
+  celery:
+    restart: always
+    build: ./src
+    command: bash -c "celery -A micro_investment worker -l INFO"
+    volumes:
+      - ./src/micro_investment:/src/micro_investment
+      - ./src/static:/src/static
+      - ./src/media:/src/media
+    networks:
+      - micro-investment-network
+    env_file:
+      - .env
+    environment:
+     - CELERY_BROKER=${CELERY_BROKER}
+     - RESULT_BACKEND=${CELERY_BACKEND}
+     - REDIS_HOST=${REDIS_HOST}
+     - REDIS_PORT=${REDIS_PORT}
+     - REDIS_PASSWORD=${REDIS_PASSWORD}
+    links:
+      - micro_investment_redis
+    depends_on:
+      - micro_investment_web
+      - micro_investment_redis
+      - micro_investment_db
+  
+  celery_beat:
+    restart: always
+    build: ./src
+    command: celery -A micro_investment beat -l info
+    volumes:
+      - ./src/micro_investment:/src/micro_investment
+      - ./src/static:/src/static
+      - ./src/media:/src/media
+    env_file:
+      - .env
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=${SECRET_KEY}
+      - CELERY_BROKER=${CELERY_BROKER}
+      - RESULT_BACKEND=${CELERY_BACKEND}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - micro-investment-network
+    links:
+      - micro_investment_redis
+    depends_on:
+      - micro_investment_web
+      - micro_investment_redis
+      - micro_investment_db
+
 volumes:
   redis_data:
     driver: local
