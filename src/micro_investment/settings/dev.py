@@ -7,12 +7,7 @@ SECRET_KEY = 'django-insecure-jb%wfsz-d!9378-7k&lyo*n-r@b)m28*z(xz7kx)(r4b^k3nr(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["a503-5-197-232-97.ngrok-free.app"]
-CSRF_TRUSTED_ORIGINS = ['https://a503-5-197-232-97.ngrok-free.app']
-CSRF_WHITELIST_ORIGINS =[
-    'https://a503-5-197-232-97.ngrok-free.app/',
-    'a503-5-197-232-97.ngrok-free.app/'
-]
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(',')
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
