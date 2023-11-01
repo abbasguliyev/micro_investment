@@ -29,15 +29,37 @@ def entrepreneur_form_update(instance, **data) -> EntrepreneurForm:
 def entrepreneur_create(
     *, owner,
     project_name: str,
-    target_amount: float,
     end_date,
     description: str,
     entrepreneur_form,
-    income: float
+    count: int = 1,
+    purchase_price: float,
+    sale_price: float,
+    platform_cost_percentage: int = 0,
+    investor_share_percentage: int = 0,
+    entrepreneur_share_percentage: int = 0,
+    debt_to_the_fund_percentage: int = 0,
+    charity_to_the_fund_percentage: int = 0
+    
 ) -> Entrepreneur:
+    total_investment = count * purchase_price
+    gross_income = count * sale_price
+    platform_cost = (gross_income - total_investment) * 2 / 100
+    final_profit = gross_income - total_investment - platform_cost
+    investor_share = final_profit * investor_share_percentage / 100
+    entrepreneur_share = final_profit * entrepreneur_share_percentage / 100
+    debt_to_the_fund = final_profit * debt_to_the_fund_percentage / 100
+    charity_to_the_fund = final_profit * charity_to_the_fund_percentage / 100
+    profit_ratio = (investor_share / total_investment) * 100
+
     entrepreneur = Entrepreneur.objects.create(
-        owner=owner, project_name=project_name, target_amount=target_amount, amount_collected=0, end_date=end_date, description=description,
-        entrepreneur_form=entrepreneur_form, income=income
+        owner=owner, project_name=project_name, end_date=end_date, description=description,
+        entrepreneur_form=entrepreneur_form, count=count, purchase_price=purchase_price, sale_price=sale_price,
+        platform_cost_percentage=platform_cost_percentage, investor_share_percentage=investor_share_percentage,
+        entrepreneur_share_percentage=entrepreneur_share_percentage, debt_to_the_fund_percentage=debt_to_the_fund_percentage,
+        charity_to_the_fund_percentage=charity_to_the_fund_percentage, total_investment=total_investment, gross_income=gross_income,
+        platform_cost=platform_cost, final_profit=final_profit, investor_share=investor_share, entrepreneur_share=entrepreneur_share,
+        debt_to_the_fund=debt_to_the_fund, charity_to_the_fund=charity_to_the_fund, profit_ratio=profit_ratio
     )
     entrepreneur.full_clean()
     entrepreneur.save()

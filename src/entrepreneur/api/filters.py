@@ -5,14 +5,8 @@ class EntrepreneurFilter(django_filters.FilterSet):
     class Meta:
         model = Entrepreneur
         fields = {
-            'owner': ['exact'],
-            'project_name': ['exact', 'icontains'],
-            'target_amount': ['exact', 'gte', 'lte'],
-            'amount_collected': ['exact', 'gte', 'lte'],
             'start_date': ['exact', 'gte', 'lte'],
-            'end_date': ['exact', 'gte', 'lte'],
-            'entrepreneur_form': ['exact'],
-            'is_active': ['exact'],
+            'end_date': ['exact', 'gte', 'lte']
         }
 
 class EntrepreneurFormFilter(django_filters.FilterSet):

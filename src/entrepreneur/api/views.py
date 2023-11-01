@@ -56,6 +56,7 @@ class EntrepreneurViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         investor = investor_list().filter(user=request.user).last()
+        print(f"{investor=}")
         services.entrepreneur_create(owner=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Entrepreneur successfully created")}, status=status.HTTP_201_CREATED, headers=headers)

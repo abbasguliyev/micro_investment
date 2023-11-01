@@ -3,4 +3,4 @@ from investment.models import Investment
 
 @admin.register(Investment)
 class InvestmentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'investor', 'entrepreneur', 'amount', 'income')
+    list_display = ('id', 'investor', 'entrepreneur', 'amount', 'profit', 'investment_date')

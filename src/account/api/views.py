@@ -12,6 +12,24 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from account.api import serializers, selectors, services, utils, filters
 
+class LoginView(TokenObtainPairView):
+    permission_classes = (permissions.AllowAny,)
+    def post(self, request, *args, **kwargs) -> Response:
+        data = super().post(request, *args, **kwargs)
+
+        data = data.data
+        access_token = utils.jwt_decode_handler(data.get('access'))
+
+        if not selectors.user_list().filter(pk=access_token.get("user_id")).last():
+            return Response({"error": True, "detail": _("No such a user")}, status=status.HTTP_404_NOT_FOUND)
+        
+        user = selectors.user_list().filter(pk=access_token.get("user_id")).last()
+        user_logged_in.send(sender=type(user), request=request, user=user)
+
+        user_details = serializers.UserOutSerializer(user)
+        data['user_details'] = user_details.data
+        return Response(data)
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = selectors.investor_list()
     serializer_class = serializers.InvestorOutSerializer
@@ -41,7 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
         services.investor_update(instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Investor successfully updated")}, status=status.HTTP_200_OK)
     
-    @action(methods=["GET"], detail=False, serializer_class=serializers.InvestorOutSerializer)
+    @action(methods=["GET"], detail=False, serializer_class=serializers.InvestorOutSerializer, filterset_class=None, pagination_class=None)
     def me(self, request, *args, **kwargs):
         user = request.user
         investor = selectors.investor_list().filter(user=user).last()
@@ -116,21 +134,3 @@ class EducationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         services.education_update(instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Education successfully updated")}, status=status.HTTP_200_OK)
-    
-class LoginView(TokenObtainPairView):
-    permission_classes = (permissions.AllowAny,)
-    def post(self, request, *args, **kwargs) -> Response:
-        data = super().post(request, *args, **kwargs)
-
-        data = data.data
-        access_token = utils.jwt_decode_handler(data.get('access'))
-
-        if not selectors.user_list().filter(pk=access_token.get("user_id")).last():
-            return Response({"error": True, "detail": _("No such a user")}, status=status.HTTP_404_NOT_FOUND)
-        
-        user = selectors.user_list().filter(pk=access_token.get("user_id")).last()
-        user_logged_in.send(sender=type(user), request=request, user=user)
-
-        user_details = serializers.UserOutSerializer(user)
-        data['user_details'] = user_details.data
-        return Response(data)
