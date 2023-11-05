@@ -75,7 +75,7 @@ class Investor(models.Model):
         super().save(*args, **kwargs)
 
 class Education(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='education')
+    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='education')
     education_place = models.CharField(_("Education Place"), max_length=100)
     education_branch = models.CharField(_("Education Branch"), max_length=100)
     city = models.CharField(_("City"), max_length=255)
@@ -84,7 +84,7 @@ class Education(models.Model):
     is_continue = models.BooleanField(default=False)
 
 class Experience(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='experience',null=True)
+    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='experience',null=True)
     experience_place = models.CharField(_("Experience Place"), max_length=100)
     position = models.CharField(_("Position"), max_length=100)
     description = models.TextField(_("Description"), null=True, blank=True)
@@ -94,6 +94,6 @@ class Experience(models.Model):
     is_continue = models.BooleanField(default=False)
 
 class UserBalance(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="balance")
+    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name="balance")
     balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)
 

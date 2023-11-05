@@ -72,7 +72,7 @@ def investor_update(instance, **data) -> Investor:
     return investor
 
 def education_create(
-    *, user = get_user_model(),
+    *, user,
     education_place: str,
     education_branch: str,
     city: str,
@@ -104,7 +104,7 @@ def education_update(instance, **data) -> Education:
     return education
 
 def experience_create(
-    *, user = get_user_model(),
+    *, user,
     experience_place: str,
     position: str,
     description: str = None,

@@ -94,7 +94,8 @@ class ExperienceViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        services.experience_create(user=request.user, **serializer.validated_data)
+        investor = selectors.investor_list().filter(user=request.user).last()
+        services.experience_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Experience successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
     
@@ -123,7 +124,8 @@ class EducationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        services.education_create(user=request.user, **serializer.validated_data)
+        investor = selectors.investor_list().filter(user=request.user).last()
+        services.education_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Education successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
     

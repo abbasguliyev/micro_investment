@@ -7,4 +7,5 @@ class Investment(models.Model):
     entrepreneur = models.ForeignKey('entrepreneur.Entrepreneur', on_delete=models.CASCADE, related_name="investments")
     amount = models.DecimalField(_('Amount'), max_digits=10, decimal_places=2)
     profit = models.DecimalField(_('Profit'), max_digits=10, decimal_places=2)
+    final_profit = models.DecimalField(_('Final Profit'), max_digits=10, decimal_places=2)
     investment_date = models.DateField(_("Investment date"), auto_now_add=True, help_text="Yatırım tarixi")

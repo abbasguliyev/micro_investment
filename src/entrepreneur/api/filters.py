@@ -5,6 +5,7 @@ class EntrepreneurFilter(django_filters.FilterSet):
     class Meta:
         model = Entrepreneur
         fields = {
+            'owner': ['exact'],
             'start_date': ['exact', 'gte', 'lte'],
             'end_date': ['exact', 'gte', 'lte']
         }

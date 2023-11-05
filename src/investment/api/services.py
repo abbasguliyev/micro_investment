@@ -18,17 +18,19 @@ def investment_create(
     if has_investment:
         raise ValidationError({"data": _("You can invest only 1 time for the same investment")})
     
-    profit = amount * entrepreneur.profit_ratio / 100
+    profit = float(amount) * float(entrepreneur.profit_ratio) / 100
+    final_profit=float(amount)+float(profit)
     
     investment = Investment.objects.create(
         investor=investor, entrepreneur=entrepreneur, 
         amount=amount, 
-        profit=profit
+        profit=profit,
+        final_profit=final_profit
     )
     investment.full_clean()
     investment.save()
 
-    entrepreneur.amount_collected = amount
+    entrepreneur.amount_collected = entrepreneur.amount_collected + amount
     entrepreneur.save()
 
     return investment

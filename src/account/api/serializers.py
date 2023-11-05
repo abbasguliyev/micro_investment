@@ -133,8 +133,6 @@ class ExperienceUpdateSerializer(serializers.ModelSerializer):
         }
 
 class ExperienceOutSerializer(serializers.ModelSerializer):
-    user = UserOutSerializer()
-
     class Meta:
         model = Experience
         fields = [
@@ -176,8 +174,6 @@ class EducationUpdateSerializer(serializers.ModelSerializer):
         }
 
 class EducationOutSerializer(serializers.ModelSerializer):
-    user = UserOutSerializer()
-
     class Meta:
         model = Education
         fields = [
