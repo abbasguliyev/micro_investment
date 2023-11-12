@@ -52,6 +52,14 @@ def entrepreneur_create(
     charity_to_the_fund = final_profit * charity_to_the_fund_percentage / 100
     profit_ratio = (investor_share / total_investment) * 100
 
+    platform_cost = "%.2f" % platform_cost
+    final_profit = "%.2f" % final_profit
+    investor_share = "%.2f" % investor_share
+    entrepreneur_share = "%.2f" % entrepreneur_share
+    debt_to_the_fund = "%.2f" % debt_to_the_fund
+    charity_to_the_fund = "%.2f" % charity_to_the_fund
+    profit_ratio = float("%.2f" % profit_ratio)
+
     entrepreneur = Entrepreneur.objects.create(
         owner=owner, project_name=project_name, end_date=end_date, description=description,
         entrepreneur_form=entrepreneur_form, count=count, purchase_price=purchase_price, sale_price=sale_price,

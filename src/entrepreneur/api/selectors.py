@@ -6,7 +6,7 @@ def entrepreneur_form_list() -> QuerySet[EntrepreneurForm]:
     return qs
 
 def entrepreneur_list() -> QuerySet[Entrepreneur]:
-    qs = Entrepreneur.objects.select_related('owner').all()
+    qs = Entrepreneur.objects.select_related('owner').order_by("-pk").all()
     return qs
 
 def entrepreneur_images_list() -> QuerySet[EntrepreneurImages]:

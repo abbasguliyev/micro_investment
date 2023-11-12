@@ -92,8 +92,6 @@ class EntrepreneurImagesUpdateSerializer(serializers.ModelSerializer):
         fields = ['image']
 
 class EntrepreneurImagesOutSerializer(serializers.ModelSerializer):
-    entrepreneur = EntrepreneurOutSerializer()
-
     class Meta:
         model = EntrepreneurImages
         fields = ['id', 'entrepreneur', 'image']
