@@ -4,11 +4,11 @@ from account.models import Education, Experience, Investor, UserBalance
 
 
 def user_list() -> QuerySet[get_user_model()]:
-    qs = get_user_model().objects.prefetch_related('user_permissions', 'groups').all()
+    qs = get_user_model().objects.prefetch_related('user_permissions', 'groups').order_by("-pk").all()
     return qs
 
 def investor_list() -> QuerySet[Investor]:
-    qs = Investor.objects.select_related('user').prefetch_related('references').all()
+    qs = Investor.objects.select_related('user').prefetch_related('references').order_by("-pk").all()
     return qs
 
 def experience_list() -> QuerySet[Experience]:
@@ -20,5 +20,5 @@ def education_list() -> QuerySet[Education]:
     return qs
 
 def user_balance_list() -> QuerySet[UserBalance]:
-    qs = UserBalance.objects.select_related('user').all()
+    qs = UserBalance.objects.select_related('user').order_by("-pk").all()
     return qs

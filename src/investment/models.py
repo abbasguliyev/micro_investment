@@ -9,3 +9,7 @@ class Investment(models.Model):
     profit = models.DecimalField(_('Profit'), max_digits=10, decimal_places=2)
     final_profit = models.DecimalField(_('Final Profit'), max_digits=10, decimal_places=2)
     investment_date = models.DateField(_("Investment date"), auto_now_add=True, help_text="Yatırım tarixi")
+    is_submitted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-pk',)

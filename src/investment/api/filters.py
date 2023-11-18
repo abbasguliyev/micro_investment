@@ -7,5 +7,6 @@ class InvestmentFilter(django_filters.FilterSet):
         fields = {
             'investor': ['exact'],
             'entrepreneur': ['exact'],
-            'investment_date': ['exact']
+            'investment_date': ['exact'],
+            'is_submitted': ['exact']
         }

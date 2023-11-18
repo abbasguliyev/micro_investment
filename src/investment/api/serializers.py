@@ -5,16 +5,20 @@ from account.models import Investor
 from entrepreneur.models import Entrepreneur
 from investment.api.selectors import investment_list
 from account.api.serializers import InvestorOutSerializer
+from account.api.selectors import investor_list
 from entrepreneur.api.selectors import entrepreneur_list
 from entrepreneur.api.serializers import EntrepreneurOutSerializer
 
 class InvestmentCreateSerializer(serializers.ModelSerializer):
+    investor = serializers.PrimaryKeyRelatedField(
+        queryset = investor_list(), write_only=True, allow_null=True, allow_empty=True
+    )
     entrepreneur = serializers.PrimaryKeyRelatedField(
         queryset = entrepreneur_list(), write_only=True
     )
     class Meta:
         model = Investment
-        fields = ['entrepreneur', 'amount']
+        fields = ['investor', 'entrepreneur', 'amount', 'is_submitted']
 
 class InvestmentOutSerializer(serializers.ModelSerializer):
     class InvestorInlineSerializer(serializers.ModelSerializer):
@@ -38,4 +42,4 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
     entrepreneur = EntrepreneurInlineOutSerializer()
     class Meta:
         model = Investment
-        fields = ['id', 'investor', 'entrepreneur', 'amount', 'profit', 'final_profit', 'investment_date']
+        fields = ['id', 'investor', 'entrepreneur', 'amount', 'profit', 'final_profit', 'investment_date', 'is_submitted']

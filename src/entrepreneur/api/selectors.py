@@ -10,5 +10,5 @@ def entrepreneur_list() -> QuerySet[Entrepreneur]:
     return qs
 
 def entrepreneur_images_list() -> QuerySet[EntrepreneurImages]:
-    qs = EntrepreneurImages.objects.select_related('entrepreneur').all()
+    qs = EntrepreneurImages.objects.select_related('entrepreneur').order_by("-pk").all()
     return qs

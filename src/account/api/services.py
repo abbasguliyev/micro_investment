@@ -33,11 +33,17 @@ def investor_create(
     credit_cart_number: str,
     debt_amount: float = 0,
     monthly_income: float = 0,
-    references,
-    profile_picture,
+    references = [],
+    references_list = [],
+    profile_picture=None,
     about: str = None,
     business_activities: str = None
 ) -> Investor:
+    print(f"{references=}")
+    user_exists = user_list().filter(email=email).exists()
+    if user_exists:
+        raise ValidationError({"detail": _("Zəhmət olmasa doğru emaili daxil etdiyinizdən əmin olun")})
+
     user = user_create(first_name=first_name, last_name=last_name, email=email, password=password)
     check_investor_instance_of_user = investor_list().filter(user=user)
     if check_investor_instance_of_user.count() == 0:
@@ -61,13 +67,22 @@ def investor_create(
             business_activities=business_activities
         )
 
-    if references is not None:
-        investor.references.set(references)
+    if references_list is not None:
+        investor.references.set(references_list[0].split(","))
         investor.save
 
     return investor
 
 def investor_update(instance, **data) -> Investor:
+    user_data = dict()
+    if data.get("first_name") is not None:
+        user_data["first_name"] = data.pop("first_name")
+    if data.get("last_name") is not None:
+        user_data["last_name"] = data.pop("last_name")
+    if data.get("email") is not None:
+        user_data["email"] = data.pop("email")
+
+    user = user_list().filter(investor=instance).update(**user_data)
     investor = investor_list().filter(pk=instance.pk).update(**data)
     return investor
 
@@ -81,10 +96,10 @@ def education_create(
     is_continue: bool = False
 ) -> Education:
     if is_continue==False and end_year is not None and end_year <= start_year:
-        raise ValidationError({"data": _("The end year cannot be greater than or equal to the start year")})
+        raise ValidationError({"detail": _("The end year cannot be greater than or equal to the start year")})
 
     if is_continue == False and end_year is None:
-        raise ValidationError({"data": _("The end year is required")})
+        raise ValidationError({"detail": _("The end year is required")})
     
     if is_continue == True and end_year is not None:
         end_year = None
@@ -114,10 +129,10 @@ def experience_create(
     is_continue: bool = False
 ) -> Experience:
     if is_continue==False and end_year is not None and end_year <= start_year:
-        raise ValidationError({"data": _("The end year cannot be greater than or equal to the start year")})
+        raise ValidationError({"detail": _("The end year cannot be greater than or equal to the start year")})
 
     if is_continue == False and end_year is None:
-        raise ValidationError({"data": _("The end year is required")})
+        raise ValidationError({"detail": _("The end year is required")})
     
     if is_continue == True and end_year is not None:
         end_year = None

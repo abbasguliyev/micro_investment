@@ -39,6 +39,7 @@ class InvestorCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField()
+    references = serializers.PrimaryKeyRelatedField(queryset=user_list(), many=True)
 
     class Meta:
         model = Investor
@@ -57,7 +58,7 @@ class InvestorCreateSerializer(serializers.ModelSerializer):
             'address': {'required': True},
             'credit_cart_number': {'required': True},
             'references': {'required': False},
-            'profile_picture': {'required': True},
+            'profile_picture': {'required': False},
             'about': {'required': False},
             'business_activities': {'required': False},
         }

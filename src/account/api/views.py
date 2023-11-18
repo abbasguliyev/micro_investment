@@ -43,11 +43,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return serializers.InvestorUpdateSerializer
 
         return super().get_serializer_class()
-
+        
     def create(self, request, *args, **kwargs):
+        reference_data = request.data.pop("references")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        services.investor_create(**serializer.validated_data)
+        services.investor_create(references_list=reference_data, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Investor successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
     
