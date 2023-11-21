@@ -11,11 +11,13 @@ from phonenumber_field.modelfields import PhoneNumberField
 from micro_investment.validators import compress
 from account import enums
 
+
 class UserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def create_user(self, email, password, **extra_fields):
         """
         Create and save a user with the given email and password.
@@ -41,15 +43,17 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         return self.create_user(email, password, **extra_fields)
-    
+
+
 class User(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
 
 class Investor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="investor")
@@ -63,7 +67,9 @@ class Investor(models.Model):
     debt_amount = models.DecimalField(_("Debt Amount"), max_digits=10, decimal_places=2, default=0)
     monthly_income = models.DecimalField(_("Monthly Income"), max_digits=10, decimal_places=2, default=0)
     references = models.ManyToManyField(User, related_name="investors", verbose_name=_("References"), blank=True)
-    profile_picture = models.ImageField(_("Profile Picture"), upload_to="investor/profile_pictures/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])
+    profile_picture = models.ImageField(_("Profile Picture"), upload_to="investor/profile_pictures/", null=True, blank=True, validators=[FileExtensionValidator(['png',
+                                                                                                                                                                 'jpeg',
+                                                                                                                                                                 'jpg'])])
     about = models.TextField(_("about"), null=True, blank=True)
     business_activities = models.TextField(_("Business Activities"), null=True, blank=True)
 
@@ -74,26 +80,30 @@ class Investor(models.Model):
 
         super().save(*args, **kwargs)
 
+
 class Education(models.Model):
     user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='education')
     education_place = models.CharField(_("Education Place"), max_length=100)
     education_branch = models.CharField(_("Education Branch"), max_length=100)
     city = models.CharField(_("City"), max_length=255)
-    start_year = models.PositiveIntegerField(('Start Year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], default=datetime.datetime.now().year)
+    start_year = models.PositiveIntegerField(('Start Year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)],
+                                             default=datetime.datetime.now().year)
     end_year = models.PositiveIntegerField(_('End Year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], null=True, blank=True)
     is_continue = models.BooleanField(default=False)
 
+
 class Experience(models.Model):
-    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='experience',null=True)
+    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='experience', null=True)
     experience_place = models.CharField(_("Experience Place"), max_length=100)
     position = models.CharField(_("Position"), max_length=100)
     description = models.TextField(_("Description"), null=True, blank=True)
     city = models.CharField(_("City"), max_length=255, null=True, blank=True)
-    start_year = models.PositiveIntegerField(('start_year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], default=datetime.datetime.now().year)
+    start_year = models.PositiveIntegerField(('start_year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)],
+                                             default=datetime.datetime.now().year)
     end_year = models.PositiveIntegerField(('end_year'), validators=[MinValueValidator(0), MaxValueValidator(datetime.date.today().year)], null=True, blank=True)
     is_continue = models.BooleanField(default=False)
 
-class UserBalance(models.Model):
-    user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name="balance")
-    balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)
 
+class UserBalance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="balance")
+    balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)

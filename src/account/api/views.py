@@ -21,7 +21,7 @@ class LoginView(TokenObtainPairView):
         access_token = utils.jwt_decode_handler(data.get('access'))
 
         if not selectors.user_list().filter(pk=access_token.get("user_id")).last():
-            return Response({"error": True, "detail": _("No such a user")}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": True, "detail": _("İstifadəçi tapılmadı")}, status=status.HTTP_404_NOT_FOUND)
         
         user = selectors.user_list().filter(pk=access_token.get("user_id")).last()
         user_logged_in.send(sender=type(user), request=request, user=user)
@@ -45,12 +45,11 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
         
     def create(self, request, *args, **kwargs):
-        reference_data = request.data.pop("references")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        services.investor_create(references_list=reference_data, **serializer.validated_data)
+        services.investor_create(**serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
-        return Response(data={'detail': _("Investor successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
@@ -58,7 +57,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         services.investor_update(instance=instance, **serializer.validated_data)
-        return Response(data={'detail': _("Investor successfully updated")}, status=status.HTTP_200_OK)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
     
     @action(methods=["GET"], detail=False, serializer_class=serializers.InvestorOutSerializer, filterset_class=None, pagination_class=None)
     def me(self, request, *args, **kwargs):
@@ -73,7 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if not user.check_password(serializer.data.get("old_password")):
-            return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"old_password": ["Yanlış şifrə."]}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(serializer.data.get("new_password"))
         user.save()
         return Response(data={'detail': _("Password updated successfully")}, status=status.HTTP_200_OK)
@@ -98,7 +97,7 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         investor = selectors.investor_list().filter(user=request.user).last()
         services.experience_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
-        return Response(data={'detail': _("Experience successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
@@ -106,7 +105,7 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         services.experience_update(instance=instance, **serializer.validated_data)
-        return Response(data={'detail': _("Experience successfully updated")}, status=status.HTTP_200_OK)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
     
 class EducationViewSet(viewsets.ModelViewSet):
     queryset = selectors.education_list()
@@ -128,7 +127,7 @@ class EducationViewSet(viewsets.ModelViewSet):
         investor = selectors.investor_list().filter(user=request.user).last()
         services.education_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
-        return Response(data={'detail': _("Education successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
@@ -136,4 +135,4 @@ class EducationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         services.education_update(instance=instance, **serializer.validated_data)
-        return Response(data={'detail': _("Education successfully updated")}, status=status.HTTP_200_OK)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
