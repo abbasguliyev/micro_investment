@@ -8,16 +8,18 @@ from investment.api import serializers, selectors, services, filters
 from investment.models import Investment
 from account.api.selectors import investor_list
 
+
 class InvestmentViewSet(viewsets.ModelViewSet):
     queryset = selectors.investment_list()
     serializer_class = serializers.InvestmentOutSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.InvestmentFilter
-    http_method_names = ['get', 'post', 'head']
 
     def get_serializer_class(self):
         if self.action == 'create':
             return serializers.InvestmentCreateSerializer
+        elif self.action == 'update':
+            return serializers.InvestmentUpdateSerializer
 
         return super().get_serializer_class()
 
@@ -27,4 +29,14 @@ class InvestmentViewSet(viewsets.ModelViewSet):
         investor = investor_list().filter(user=request.user).last()
         services.investment_create(request_user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
-        return Response(data={'detail': _("Investment successfully created")}, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data={'detail': _("İnvestisiyanız qeydə alındı")}, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        services.investment_update(instance=instance, **serializer.validated_data)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
+

@@ -1,5 +1,6 @@
 import django_filters
-from entrepreneur.models import Entrepreneur, EntrepreneurForm, EntrepreneurImages
+from entrepreneur.models import Entrepreneur, EntrepreneurImages
+
 
 class EntrepreneurFilter(django_filters.FilterSet):
     class Meta:
@@ -7,16 +8,11 @@ class EntrepreneurFilter(django_filters.FilterSet):
         fields = {
             'owner': ['exact'],
             'start_date': ['exact', 'gte', 'lte'],
-            'end_date': ['exact', 'gte', 'lte']
+            'end_date': ['exact', 'gte', 'lte'],
+            'is_active': ['exact'],
+            'is_finished': ['exact']
         }
 
-class EntrepreneurFormFilter(django_filters.FilterSet):
-    class Meta:
-        model = EntrepreneurForm
-        fields = {
-            'title': ['exact', 'icontains'],
-            'is_active': ['exact']
-        }
 
 class EntrepreneurImagesFilter(django_filters.FilterSet):
     class Meta:
@@ -24,4 +20,3 @@ class EntrepreneurImagesFilter(django_filters.FilterSet):
         fields = {
             'entrepreneur': ['exact']
         }
-

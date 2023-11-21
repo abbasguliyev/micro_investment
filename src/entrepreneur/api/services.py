@@ -1,37 +1,16 @@
+import datetime
+
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from entrepreneur.models import EntrepreneurForm, Entrepreneur, EntrepreneurImages
-from entrepreneur.api.selectors import entrepreneur_form_list, entrepreneur_list, entrepreneur_images_list
-from entrepreneur.api.utils import change_all_entrepreneur_form_is_active_field
+from entrepreneur.models import Entrepreneur, EntrepreneurImages
+from entrepreneur.api.selectors import entrepreneur_list, entrepreneur_images_list
 
-
-def entrepreneur_form_create(
-    *, title: str,
-    is_active: bool = True,
-    questions
-) -> EntrepreneurForm:
-    if is_active == True:
-        change_all_entrepreneur_form_is_active_field(True, False)
-
-    entrepreneur_form = EntrepreneurForm.objects.create(title=title, is_active=is_active, questions=questions)
-    entrepreneur_form.full_clean()
-    entrepreneur_form.save()
-
-    return entrepreneur_form
-
-def entrepreneur_form_update(instance, **data) -> EntrepreneurForm:
-    if data.get('is_active') == True:
-        change_all_entrepreneur_form_is_active_field(True, False)
-
-    entrepreneur_form = entrepreneur_form_list().filter(pk=instance.pk).update(**data)
-    return entrepreneur_form
 
 def entrepreneur_create(
     *, owner,
     project_name: str,
     end_date,
     description: str,
-    entrepreneur_form,
     count: int = 1,
     purchase_price: float,
     sale_price: float,
@@ -62,7 +41,7 @@ def entrepreneur_create(
 
     entrepreneur = Entrepreneur.objects.create(
         owner=owner, project_name=project_name, end_date=end_date, description=description,
-        entrepreneur_form=entrepreneur_form, count=count, purchase_price=purchase_price, sale_price=sale_price,
+        count=count, purchase_price=purchase_price, sale_price=sale_price,
         platform_cost_percentage=platform_cost_percentage, investor_share_percentage=investor_share_percentage,
         entrepreneur_share_percentage=entrepreneur_share_percentage, debt_to_the_fund_percentage=debt_to_the_fund_percentage,
         charity_to_the_fund_percentage=charity_to_the_fund_percentage, total_investment=total_investment, gross_income=gross_income,
@@ -75,6 +54,10 @@ def entrepreneur_create(
     return entrepreneur
 
 def entrepreneur_update(instance, **data) -> Entrepreneur:
+    if data.get("is_finished") is not None and instance.is_finished == False and data.get("is_finished") == True:
+        data["finished_date"] = datetime.date.today()
+        data["is_active"] = False
+
     entrepreneur = entrepreneur_list().filter(pk=instance.pk).update(**data)
     return entrepreneur
 

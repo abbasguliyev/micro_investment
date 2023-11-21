@@ -3,31 +3,35 @@ from django.utils.translation import gettext_lazy as _
 from investment.models import Investment
 from investment.api.selectors import investment_list
 
+
 def investment_create(
-    *, request_user, investor,
-    entrepreneur,
-    amount: float,
-    is_submitted: bool = False
+        *, request_user, investor,
+        entrepreneur,
+        amount: float,
+        is_submitted: bool = False
 ) -> Investment:
     if amount <= 0:
-        raise ValidationError({"detail": _("The amount must be greater than zero!")})
-    
-    if amount+entrepreneur.amount_collected > entrepreneur.total_investment:
-        raise ValidationError({"detail": _("The amount you invest is more than the total investment amount")})
-    
+        raise ValidationError({"detail": _("Məbləğ 0-dan böyük olmalıdır!")})
+
+    if amount + entrepreneur.amount_collected > entrepreneur.total_investment:
+        raise ValidationError({"detail": _("Məbləğ sifarişin yekun toplanmış məbləğindən çox ola bilməz")})
+
     has_investment = investment_list().filter(investor=investor, entrepreneur=entrepreneur).exists()
     if has_investment:
-        raise ValidationError({"detail": _("You can invest only 1 time for the same investment")})
-    
+        raise ValidationError({"detail": _("Eyni sifarişə yalnız 1 dəfə yatırım edə bilərsiniz")})
+
     if investor is None:
         investor = request_user
-    
+
     profit = float(amount) * float(entrepreneur.profit_ratio) / 100
-    final_profit=float(amount)+float(profit)
-    
+    profit = "{:.2f}".format(profit)
+    final_profit = float(amount) + float(profit)
+    final_profit = "{:.2f}".format(final_profit)
+
     investment = Investment.objects.create(
-        investor=investor, entrepreneur=entrepreneur, 
-        amount=amount, 
+        investor=investor,
+        entrepreneur=entrepreneur,
+        amount=amount,
         profit=profit,
         final_profit=final_profit,
         is_submitted=is_submitted
@@ -35,11 +39,32 @@ def investment_create(
     investment.full_clean()
     investment.save()
 
-    entrepreneur.amount_collected = entrepreneur.amount_collected + amount
-    entrepreneur.save()
-
     return investment
+
 
 def investment_update(instance, **data) -> Investment:
     investment = investment_list().filter(pk=instance.pk).update(**data)
+    amount = instance.amount
+    print(f"{amount=}")
+    print(f"{instance.amount=}")
+    if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
+        raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
+    if data.get("amount") is not None and data.get("is_submitted") is True:
+        amount = data.get("amount")
+        if amount <= 0:
+            raise ValidationError({"detail": _("Məbləğ 0-dan böyük olmalıdır!")})
+
+        if amount + instance.entrepreneur.amount_collected > instance.entrepreneur.total_investment:
+            raise ValidationError({"detail": _("Məbləğ sifarişin yekun toplanmış məbləğindən çox ola bilməz")})
+
+        profit = float(amount) * float(instance.entrepreneur.profit_ratio) / 100
+        final_profit = float(amount) + float(profit)
+        data['profit'] = profit
+        data['final_profit'] = profit
+    if data.get("is_submitted") is not None and instance.is_submitted is False and data.get("is_submitted") is True:
+        instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected + amount
+        instance.entrepreneur.save()
+    if data.get("is_submitted") is not None and instance.is_submitted is True and data.get("is_submitted") is False:
+        instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
+        instance.entrepreneur.save()
     return investment
