@@ -58,7 +58,7 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
     class EntrepreneurInlineOutSerializer(serializers.ModelSerializer):
         class Meta:
             model = Entrepreneur
-            fields = ['id', 'project_name', 'profit_ratio', 'start_date', 'end_date']
+            fields = ['id', 'project_name', 'profit_ratio', 'start_date', 'end_date', 'is_finished', 'is_active', 'finished_date']
 
     investor = InvestorInlineSerializer()
     entrepreneur = EntrepreneurInlineOutSerializer()
