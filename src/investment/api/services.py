@@ -90,9 +90,8 @@ def investment_report_create(
         == 0) and (total_amount != investment.final_profit):
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
 
-    if (total_amount != investment.final_profit):
+    if total_amount != investment.final_profit:
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
-
 
     investment_report = InvestmentReport.objects.create(
         investor=investor, investment=investment, amount_want_to_send_to_cart=amount_want_to_send_to_cart,
