@@ -170,3 +170,5 @@ staticfiles/
 media
 /media/
 /media
+
+.idea
