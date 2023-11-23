@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from investment.models import Investment
+from investment.models import Investment, InvestmentReport
 from account.models import Investor
 from entrepreneur.models import Entrepreneur
 from investment.api.selectors import investment_list
@@ -67,3 +67,47 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
         model = Investment
         fields = ['id', 'investor', 'entrepreneur', 'amount', 'profit', 'final_profit', 'investment_date',
                   'is_submitted']
+
+
+class InvestmentReportCreateSerializer(serializers.ModelSerializer):
+    investor = serializers.PrimaryKeyRelatedField(
+        queryset=investor_list(), write_only=True
+    )
+    investment = serializers.PrimaryKeyRelatedField(
+        queryset=investment_list(), write_only=True
+    )
+
+    class Meta:
+        model = InvestmentReport
+        fields = ['investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+                  'amount_want_to_send_to_debt_fund', 'note']
+
+
+class InvestmentReportUpdateSerializer(serializers.ModelSerializer):
+    investor = serializers.PrimaryKeyRelatedField(
+        queryset=investor_list(), write_only=True
+    )
+    investment = serializers.PrimaryKeyRelatedField(
+        queryset=investment_list(), write_only=True
+    )
+
+    class Meta:
+        model = InvestmentReport
+        fields = ['investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+                  'amount_want_to_send_to_debt_fund', 'note']
+        extra_kwargs = {
+            'investor': {'required': False},
+            'investment': {'required': False},
+            'amount_want_to_send_to_cart': {'required': False},
+            'amount_want_to_keep_in_the_balance': {'required': False},
+            'amount_want_to_send_to_charity_fund': {'required': False},
+            'amount_want_to_send_to_debt_fund': {'required': False},
+            'note': {'required': False}
+        }
+
+
+class InvestmentReportOutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvestmentReport
+        fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+                  'amount_want_to_send_to_debt_fund', 'note']

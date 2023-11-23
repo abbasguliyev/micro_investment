@@ -43,10 +43,6 @@ class Entrepreneur(models.Model):
     amount_collected = models.DecimalField(_("Amount collected"), max_digits=10, decimal_places=2, default=0)
 
 
-class EntrepreneurCalculate(models.Model):
-    ...
-
-
 class EntrepreneurImages(models.Model):
     entrepreneur = models.ForeignKey(Entrepreneur, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(_("Entrepreneur Image"), upload_to="investor/entrepreneur_image/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])

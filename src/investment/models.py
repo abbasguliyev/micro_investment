@@ -13,3 +13,16 @@ class Investment(models.Model):
 
     class Meta:
         ordering = ('-pk',)
+
+
+class InvestmentReport(models.Model):
+    investor = models.ForeignKey('account.Investor', on_delete=models.CASCADE, related_name="investment_report")
+    investment = models.ForeignKey('investment.Investment', on_delete=models.CASCADE, related_name="investment_report")
+    amount_want_to_send_to_cart = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_want_to_keep_in_the_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_want_to_send_to_charity_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_want_to_send_to_debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    note = models.TextField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-pk',)
