@@ -12,8 +12,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from account.api import serializers, selectors, services, utils, filters
 
+
 class LoginView(TokenObtainPairView):
     permission_classes = (permissions.AllowAny,)
+
     def post(self, request, *args, **kwargs) -> Response:
         data = super().post(request, *args, **kwargs)
 
@@ -22,13 +24,14 @@ class LoginView(TokenObtainPairView):
 
         if not selectors.user_list().filter(pk=access_token.get("user_id")).last():
             return Response({"error": True, "detail": _("İstifadəçi tapılmadı")}, status=status.HTTP_404_NOT_FOUND)
-        
+
         user = selectors.user_list().filter(pk=access_token.get("user_id")).last()
         user_logged_in.send(sender=type(user), request=request, user=user)
 
         user_details = serializers.UserOutSerializer(user)
         data['user_details'] = user_details.data
         return Response(data)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = selectors.investor_list()
@@ -43,14 +46,14 @@ class UserViewSet(viewsets.ModelViewSet):
             return serializers.InvestorUpdateSerializer
 
         return super().get_serializer_class()
-        
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         services.investor_create(**serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
-    
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
@@ -58,14 +61,14 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         services.investor_update(instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
-    
+
     @action(methods=["GET"], detail=False, serializer_class=serializers.InvestorOutSerializer, filterset_class=None, pagination_class=None)
     def me(self, request, *args, **kwargs):
         user = request.user
         investor = selectors.investor_list().filter(user=user).last()
         serializers = self.get_serializer(investor)
         return Response(serializers.data)
-    
+
     @action(methods=["POST"], detail=False, serializer_class=serializers.ChangePasswordSerializer, url_path="change-password")
     def change_password(self, request, *args, **kwargs):
         user = request.user
@@ -76,7 +79,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user.set_password(serializer.data.get("new_password"))
         user.save()
         return Response(data={'detail': _("Password updated successfully")}, status=status.HTTP_200_OK)
-    
+
+
 class ExperienceViewSet(viewsets.ModelViewSet):
     queryset = selectors.experience_list()
     serializer_class = serializers.ExperienceOutSerializer
@@ -90,7 +94,7 @@ class ExperienceViewSet(viewsets.ModelViewSet):
             return serializers.ExperienceUpdateSerializer
 
         return super().get_serializer_class()
-    
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -98,7 +102,7 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         services.experience_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
-    
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
@@ -106,7 +110,8 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         services.experience_update(instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
-    
+
+
 class EducationViewSet(viewsets.ModelViewSet):
     queryset = selectors.education_list()
     serializer_class = serializers.EducationOutSerializer
@@ -120,7 +125,7 @@ class EducationViewSet(viewsets.ModelViewSet):
             return serializers.EducationUpdateSerializer
 
         return super().get_serializer_class()
-    
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -128,7 +133,7 @@ class EducationViewSet(viewsets.ModelViewSet):
         services.education_create(user=investor, **serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
-    
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', True)
         instance = self.get_object()

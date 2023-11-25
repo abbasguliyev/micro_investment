@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from account.models import Investor, Experience, Education, UserBalance
 from account.api.selectors import user_list
 
+
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
@@ -14,6 +15,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'email': {'required': True}
         }
 
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
@@ -24,15 +26,18 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             'email': {'required': False}
         }
 
+
 class UserOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['first_name', 'last_name', 'email', 'is_staff']
 
+
 class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
 
 class InvestorCreateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
@@ -63,6 +68,7 @@ class InvestorCreateSerializer(serializers.ModelSerializer):
             'business_activities': {'required': False},
         }
 
+
 class InvestorUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -89,17 +95,19 @@ class InvestorUpdateSerializer(serializers.ModelSerializer):
             'business_activities': {'required': False},
         }
 
+
 class InvestorOutSerializer(serializers.ModelSerializer):
     user = UserOutSerializer(read_only=True)
-    
+
     class Meta:
         model = Investor
         fields = [
-            'id', 'user', 'birthdate', 'address', 'marital_status', 'employment_status', 
-            'housing_status', 'phone_number', 'credit_cart_number', 'debt_amount', 
-            'monthly_income', 'references', 'profile_picture', 'about', 
+            'id', 'user', 'birthdate', 'address', 'marital_status', 'employment_status',
+            'housing_status', 'phone_number', 'credit_cart_number', 'debt_amount',
+            'monthly_income', 'references', 'profile_picture', 'about',
             'business_activities'
         ]
+
 
 class ExperienceCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,6 +125,7 @@ class ExperienceCreateSerializer(serializers.ModelSerializer):
             'is_continue': {'required': True},
         }
 
+
 class ExperienceUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
@@ -133,6 +142,7 @@ class ExperienceUpdateSerializer(serializers.ModelSerializer):
             'is_continue': {'required': False},
         }
 
+
 class ExperienceOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
@@ -146,7 +156,7 @@ class EducationCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = [
-            'education_place', 'education_branch', 
+            'education_place', 'education_branch',
             'city', 'start_year', 'end_year', 'is_continue'
         ]
 
@@ -158,11 +168,12 @@ class EducationCreateSerializer(serializers.ModelSerializer):
             'is_continue': {'required': True},
         }
 
+
 class EducationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = [
-            'education_place', 'education_branch', 
+            'education_place', 'education_branch',
             'city', 'start_year', 'end_year', 'is_continue'
         ]
 
@@ -174,13 +185,15 @@ class EducationUpdateSerializer(serializers.ModelSerializer):
             'is_continue': {'required': False},
         }
 
+
 class EducationOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = [
-            'id', 'user', 'education_place', 'education_branch', 
+            'id', 'user', 'education_place', 'education_branch',
             'city', 'start_year', 'end_year', 'is_continue'
         ]
+
 
 class UserBalanceOutSerializer(serializers.ModelSerializer):
     class Meta:

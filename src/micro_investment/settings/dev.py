@@ -4,9 +4,6 @@ from datetime import timedelta
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-jb%wfsz-d!9378-7k&lyo*n-r@b)m28*z(xz7kx)(r4b^k3nr('
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(',')
 
 # Database

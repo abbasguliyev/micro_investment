@@ -44,7 +44,7 @@ def investor_create(
     user_exists = user_list().filter(email=email).exists()
     if user_exists:
         raise ValidationError({"detail": _("Zəhmət olmasa doğru emaili daxil etdiyinizdən əmin olun")})
-
+    print(f"{profile_picture=}")
     user = user_create(first_name=first_name, last_name=last_name, email=email, password=password)
     check_investor_instance_of_user = investor_list().filter(user=user)
     if check_investor_instance_of_user.count() == 0:
@@ -64,7 +64,7 @@ def investor_create(
             marital_status=marital_status, employment_status=employment_status,
             housing_status=housing_status, phone_number=phone_number,
             credit_cart_number=credit_cart_number, debt_amount=debt_amount,
-            monthly_income=monthly_income, profile_pictures=profile_picture, about=about,
+            monthly_income=monthly_income, profile_picture=profile_picture, about=about,
             business_activities=business_activities
         )
 
@@ -83,9 +83,16 @@ def investor_update(instance, **data) -> Investor:
         user_data["last_name"] = data.pop("last_name")
     if data.get("email") is not None:
         user_data["email"] = data.pop("email")
-
+    print(f"{data=}")
+    if data.get('profile_picture'):
+        profile_picture = data.pop("profile_picture")
+    else:
+        profile_picture = instance.profile_picture
     user = user_list().filter(investor=instance).update(**user_data)
     investor = investor_list().filter(pk=instance.pk).update(**data)
+    investor_instance = investor_list().filter(pk=instance.pk).last()
+    investor_instance.profile_picture = profile_picture
+    investor_instance.save()
     return investor
 
 
