@@ -1,7 +1,17 @@
+from django.db.models import Q
+from django.db.models import Value as V
+from django.db.models.functions import Concat   
 import django_filters
 from account.models import Investor, Experience, Education
 
 class InvestorFilter(django_filters.FilterSet):
+    fullname = django_filters.CharFilter(method="fullname_filter", label="fullname")
+
+    def fullname_filter(self, queryset, name, value):
+        qs = queryset.annotate(fullname=Concat('user__first_name', V(' '), 'user__last_name')).filter(fullname__icontains=value)
+        return qs
+
+
     class Meta:
         model = Investor
         fields = {

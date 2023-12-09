@@ -4,7 +4,7 @@ from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list
 from account.api.serializers import InvestorOutSerializer
 from account.models import Investor
-from investment.models import Investment
+from investment.models import Investment, InvestmentReport
 
 
 class EntrepreneurCreateSerializer(serializers.ModelSerializer):
@@ -62,12 +62,19 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
                 model = Investor
                 fields = ['id', 'user']
 
+        class InvestmentReportInlineSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = InvestmentReport
+                fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+                          'amount_want_to_send_to_debt_fund', 'note']
+
         investor = InvestmentInvestorInlineSerializer()
+        investment_report = InvestmentReportInlineSerializer(many=True)
 
         class Meta:
             model = Investment
             fields = ['id', 'investor', 'entrepreneur', 'amount', 'profit', 'final_profit', 'investment_date',
-                      'is_submitted']
+                      'is_submitted', 'investment_report']
 
     owner = InvestorOutSerializer()
     images = EntrepreneurNestedImagesSerializer(many=True)

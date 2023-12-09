@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from account.models import Investor, Experience, Education, UserBalance
+from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
 from account.api.selectors import user_list
 
 
@@ -199,3 +199,8 @@ class UserBalanceOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserBalance
         fields = ['id', 'user', 'balance']
+
+class CompanyBalanceOutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyBalance
+        fields = ['id', 'debt_fund', 'charity_fund']

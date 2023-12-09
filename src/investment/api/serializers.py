@@ -4,10 +4,8 @@ from investment.models import Investment, InvestmentReport
 from account.models import Investor
 from entrepreneur.models import Entrepreneur
 from investment.api.selectors import investment_list
-from account.api.serializers import InvestorOutSerializer
 from account.api.selectors import investor_list
 from entrepreneur.api.selectors import entrepreneur_list
-from entrepreneur.api.serializers import EntrepreneurOutSerializer
 
 
 class InvestmentCreateSerializer(serializers.ModelSerializer):
@@ -60,13 +58,20 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
             model = Entrepreneur
             fields = ['id', 'project_name', 'profit_ratio', 'start_date', 'end_date', 'is_finished', 'is_active', 'finished_date']
 
+    class InvestmentReportInlineOutSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = InvestmentReport
+            fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+                      'amount_want_to_send_to_debt_fund', 'note']
+
     investor = InvestorInlineSerializer()
     entrepreneur = EntrepreneurInlineOutSerializer()
+    investment_report = InvestmentReportInlineOutSerializer(many=True)
 
     class Meta:
         model = Investment
         fields = ['id', 'investor', 'entrepreneur', 'amount', 'profit', 'final_profit', 'investment_date',
-                  'is_submitted']
+                  'is_submitted', 'investment_report']
 
 
 class InvestmentReportCreateSerializer(serializers.ModelSerializer):

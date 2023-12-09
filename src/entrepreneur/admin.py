@@ -1,5 +1,5 @@
 from django.contrib import admin
-from entrepreneur.models import Entrepreneur, EntrepreneurImages, DebtFund, CharityFund
+from entrepreneur.models import Entrepreneur, EntrepreneurImages
 
 @admin.register(Entrepreneur)
 class EntrepreneurAdmin(admin.ModelAdmin):
@@ -15,13 +15,3 @@ class EntrepreneurAdmin(admin.ModelAdmin):
 class EntrepreneurImagesAdmin(admin.ModelAdmin):
     list_display = ('id', 'entrepreneur')
     list_display_links = ('id', 'entrepreneur')
-
-@admin.register(DebtFund)
-class DebtFundAdmin(admin.ModelAdmin):
-    list_display = ('id', 'amount')
-    list_display_links = ('id',)
-
-@admin.register(CharityFund)
-class CharityFundAdmin(admin.ModelAdmin):
-    list_display = ('id', 'amount')
-    list_display_links = ('id',)

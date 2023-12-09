@@ -7,6 +7,7 @@ class EntrepreneurFilter(django_filters.FilterSet):
         model = Entrepreneur
         fields = {
             'owner': ['exact'],
+            'project_name': ['exact', 'icontains'],
             'start_date': ['exact', 'gte', 'lte'],
             'end_date': ['exact', 'gte', 'lte'],
             'is_active': ['exact'],

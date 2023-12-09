@@ -141,3 +141,16 @@ class EducationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         services.education_update(instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
+
+
+class CompanyBalanceViewSet(viewsets.ModelViewSet):
+    queryset = selectors.company_balance_list()
+    serializer_class = serializers.CompanyBalanceOutSerializer
+    http_method_names = ['get', 'post', 'head']
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.company_balance_create(**serializer.validated_data)
+        headers = self.get_success_headers(serializer.data)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)

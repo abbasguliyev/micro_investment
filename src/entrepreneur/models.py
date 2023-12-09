@@ -53,11 +53,3 @@ class EntrepreneurImages(models.Model):
             self.image = compressed_image
 
         super().save(*args, **kwargs)
-
-
-class DebtFund(models.Model):
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-
-class CharityFund(models.Model):
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)

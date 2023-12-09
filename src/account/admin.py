@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from account.models import Investor, Experience, Education, UserBalance
+from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
 
 
 @admin.register(get_user_model())
@@ -26,3 +26,8 @@ class EducationAdmin(admin.ModelAdmin):
 class UserBalanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'balance')
     list_display_links = ('id', 'user')
+
+@admin.register(CompanyBalance)
+class CompanyBalanceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'debt_fund', 'charity_fund')
+    list_display_links = ('id',)

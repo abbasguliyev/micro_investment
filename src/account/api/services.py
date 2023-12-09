@@ -3,8 +3,8 @@ import datetime
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
-from account.models import Investor, Experience, Education, UserBalance
-from account.api.selectors import user_list, investor_list, experience_list, education_list
+from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
+from account.api.selectors import user_list, investor_list, experience_list, education_list, company_balance_list, user_balance_list
 
 
 def user_create(
@@ -44,7 +44,6 @@ def investor_create(
     user_exists = user_list().filter(email=email).exists()
     if user_exists:
         raise ValidationError({"detail": _("Zəhmət olmasa doğru emaili daxil etdiyinizdən əmin olun")})
-    print(f"{profile_picture=}")
     user = user_create(first_name=first_name, last_name=last_name, email=email, password=password)
     check_investor_instance_of_user = investor_list().filter(user=user)
     if check_investor_instance_of_user.count() == 0:
@@ -164,8 +163,30 @@ def experience_update(instance, **data) -> Experience:
 
 
 def user_balance_create(*, user, balance: float = 0) -> UserBalance:
-    user_balance = UserBalance.objects.create(user=user, balance=balance)
-    user_balance.full_clean()
-    user_balance.save()
+    user_balance_instance = user_balance_list().filter(user=user)
+
+    if user_balance_instance.exists():
+        user_balance = user_balance_instance.last()
+        user_balance.balance = float(user_balance.balance) + float(balance)
+        user_balance.save()
+    else:
+        user_balance = UserBalance.objects.create(user=user, balance=balance)
+        user_balance.full_clean()
+        user_balance.save()
 
     return user_balance
+
+def company_balance_create(*, debt_fund: float = 0, charity_fund: float = 0) -> CompanyBalance:
+    company_balance_instance = company_balance_list()
+
+    if company_balance_instance.exists():
+        company_balance = company_balance_instance.last()
+        company_balance.debt_fund = float(company_balance.debt_fund) + float(debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) + float(charity_fund)
+        company_balance.save()
+    else:
+        company_balance = CompanyBalance.objects.create(debt_fund=debt_fund, charity_fund=charity_fund)
+        company_balance.full_clean()
+        company_balance.save()
+
+    return company_balance

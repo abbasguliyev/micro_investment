@@ -54,6 +54,10 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    @property
+    def get_full_name(self) -> str:
+        return super().get_full_name()
+
 
 class Investor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="investor")
@@ -107,3 +111,7 @@ class Experience(models.Model):
 class UserBalance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="balance")
     balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)
+
+class CompanyBalance(models.Model):
+    debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    charity_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
