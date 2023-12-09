@@ -100,6 +100,21 @@ def investment_report_create(
 
     if investment_report_is_exists.exists():
         investment_report = investment_report_is_exists.last()
+        company_balance = company_balance_list().last()
+
+        company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
+        company_balance.save()
+
+        user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
+        print(f"{user_balance=}")
+        print(f"{investment_report.investor=}")
+        print(f"{investment_report.investor.user=}")
+        print(f"{amount_want_to_keep_in_the_balance=}")
+        print(f"{investment_report.amount_want_to_keep_in_the_balance=}")
+        user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
+        user_balance.save()
+
         investment_report.investor = investor
         investment_report.investment = investment
         investment_report.amount_want_to_send_to_cart = amount_want_to_send_to_cart
@@ -109,24 +124,12 @@ def investment_report_create(
         investment_report.note = note
         investment_report.save()
         
-        company_balance = company_balance_list().last()
-
-        company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
-        company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
-        company_balance.save()
-
         company_balance.debt_fund = float(company_balance.debt_fund) + float(amount_want_to_send_to_debt_fund)
         company_balance.charity_fund = float(company_balance.charity_fund) + float(amount_want_to_send_to_charity_fund)
         company_balance.save()
 
-        user_balance = user_balance_list().filter(user=investment_report.investor).last()
-
-        user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
-        user_balance.save()
-
         user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
         user_balance.save()
-
 
     else:
         investment_report = InvestmentReport.objects.create(
@@ -140,7 +143,11 @@ def investment_report_create(
         company_balance.charity_fund = float(company_balance.charity_fund) + float(amount_want_to_send_to_charity_fund)
         company_balance.save()
 
-        user_balance = user_balance_list().filter(user=investment_report.investor).last()
+        user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
+        print(f"{user_balance=}")
+        print(f"{investment_report.investor=}")
+        print(f"{investment_report.investor.user=}")
+        print(f"{amount_want_to_keep_in_the_balance=}")
         user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
         user_balance.save()
     
