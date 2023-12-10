@@ -4,7 +4,7 @@ from investment.models import Investment, InvestmentReport
 from account.models import Investor
 from entrepreneur.models import Entrepreneur
 from investment.api.selectors import investment_list
-from account.api.selectors import investor_list
+from account.api.selectors import investor_list, user_balance_list
 from entrepreneur.api.selectors import entrepreneur_list
 
 
@@ -43,9 +43,18 @@ class InvestmentUpdateSerializer(serializers.ModelSerializer):
 class InvestmentOutSerializer(serializers.ModelSerializer):
     class InvestorInlineSerializer(serializers.ModelSerializer):
         class UserInlineSerializer(serializers.ModelSerializer):
+            balance = serializers.SerializerMethodField('get_balance')
+
+            def get_balance(self, instance):
+                balance_list = user_balance_list().filter(user=instance).last()
+                if balance_list is not None:
+                    return balance_list.balance
+                else:
+                    return 0
+                
             class Meta:
                 model = get_user_model()
-                fields = ['id', 'first_name', 'last_name']
+                fields = ['id', 'first_name', 'last_name', 'balance']
 
         user = UserInlineSerializer()
 

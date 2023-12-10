@@ -45,7 +45,7 @@ class Entrepreneur(models.Model):
 
 class EntrepreneurImages(models.Model):
     entrepreneur = models.ForeignKey(Entrepreneur, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(_("Entrepreneur Image"), upload_to="investor/entrepreneur_image/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])
+    image = models.ImageField(_("Entrepreneur Image"), max_length=1000, upload_to="investor/entrepreneur_image/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])
 
     def save(self, *args, **kwargs) -> None:
         if self.image is not None:

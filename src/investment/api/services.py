@@ -46,8 +46,6 @@ def investment_create(
 def investment_update(instance, **data) -> Investment:
     investment = investment_list().filter(pk=instance.pk).update(**data)
     amount = instance.amount
-    print(f"{amount=}")
-    print(f"{instance.amount=}")
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
     if data.get("amount") is not None and data.get("is_submitted") is True:
@@ -107,11 +105,6 @@ def investment_report_create(
         company_balance.save()
 
         user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
-        print(f"{user_balance=}")
-        print(f"{investment_report.investor=}")
-        print(f"{investment_report.investor.user=}")
-        print(f"{amount_want_to_keep_in_the_balance=}")
-        print(f"{investment_report.amount_want_to_keep_in_the_balance=}")
         user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
         user_balance.save()
 
@@ -144,10 +137,6 @@ def investment_report_create(
         company_balance.save()
 
         user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
-        print(f"{user_balance=}")
-        print(f"{investment_report.investor=}")
-        print(f"{investment_report.investor.user=}")
-        print(f"{amount_want_to_keep_in_the_balance=}")
         user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
         user_balance.save()
     

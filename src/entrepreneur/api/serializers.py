@@ -3,6 +3,7 @@ from rest_framework import serializers
 from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list
 from account.api.serializers import InvestorOutSerializer
+from account.api.selectors import user_balance_list
 from account.models import Investor
 from investment.models import Investment, InvestmentReport
 
@@ -52,9 +53,18 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
     class InvestmentNestedSerializer(serializers.ModelSerializer):
         class InvestmentInvestorInlineSerializer(serializers.ModelSerializer):
             class InvestmentInvestorUserInlineSerializer(serializers.ModelSerializer):
+                balance = serializers.SerializerMethodField('get_balance')
+
+                def get_balance(self, instance):
+                    balance_list = user_balance_list().filter(user=instance).last()
+                    if balance_list is not None:
+                        return balance_list.balance
+                    else:
+                        return 0
+                    
                 class Meta:
                     model = get_user_model()
-                    fields = ['id', 'first_name', 'last_name']
+                    fields = ['id', 'first_name', 'last_name', 'balance']
 
             user = InvestmentInvestorUserInlineSerializer()
 

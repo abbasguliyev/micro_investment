@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
-from account.api.selectors import user_list
+from account.api.selectors import user_list, user_balance_list
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -28,9 +28,18 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserOutSerializer(serializers.ModelSerializer):
+    balance = serializers.SerializerMethodField('get_balance')
+
+    def get_balance(self, instance):
+        balance_list = user_balance_list().filter(user=instance).last()
+        if balance_list is not None:
+            return balance_list.balance
+        else:
+            return 0
+
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'email', 'is_staff']
+        fields = ['first_name', 'last_name', 'email', 'is_staff', 'balance']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
