@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list, entrepreneur_images_list
+from micro_investment.validators import compress
 
 
 def entrepreneur_create(
@@ -65,6 +66,10 @@ def entrepreneur_images_create(
     *,  entrepreneur,
     image: str
 ) -> EntrepreneurImages:
+    if image is not None:
+        compressed_image = compress(image)
+        image = compressed_image
+
     entrepreneur_image = EntrepreneurImages.objects.create(entrepreneur=entrepreneur, image=image)
     entrepreneur_image.full_clean()
     entrepreneur_image.save()
