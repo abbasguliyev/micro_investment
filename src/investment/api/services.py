@@ -1,8 +1,9 @@
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from investment.models import Investment
-from investment.api.selectors import investment_list
-
+from investment.models import Investment, InvestmentReport
+from investment.api.selectors import investment_list, investment_report_list
+from account.api.selectors import company_balance_list, user_balance_list
+from account.api.services import company_balance_create
 
 def investment_create(
         *, request_user, investor,
@@ -45,8 +46,6 @@ def investment_create(
 def investment_update(instance, **data) -> Investment:
     investment = investment_list().filter(pk=instance.pk).update(**data)
     amount = instance.amount
-    print(f"{amount=}")
-    print(f"{instance.amount=}")
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
     if data.get("amount") is not None and data.get("is_submitted") is True:
@@ -68,3 +67,82 @@ def investment_update(instance, **data) -> Investment:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
         instance.entrepreneur.save()
     return investment
+
+
+def investment_report_create(
+        *, request_user,
+        investor,
+        investment,
+        amount_want_to_send_to_cart: float = 0,
+        amount_want_to_keep_in_the_balance: float = 0,
+        amount_want_to_send_to_charity_fund: float = 0,
+        amount_want_to_send_to_debt_fund: float = 0,
+        note: str = None
+) -> InvestmentReport:
+    if (request_user.is_superuser is False and request_user.is_staff is False) and request_user != investor.user:
+        raise ValidationError({'detail': _('Başqa investorun investisiya hesabatını edə bilməzsiniz')})
+
+    total_amount = float(amount_want_to_send_to_cart) + float(amount_want_to_keep_in_the_balance) + float(amount_want_to_send_to_charity_fund) + float(
+        amount_want_to_send_to_debt_fund)
+
+    if (amount_want_to_send_to_cart == 0 and amount_want_to_keep_in_the_balance == 0 and amount_want_to_send_to_charity_fund == 0 and amount_want_to_send_to_debt_fund
+        == 0) and (float(total_amount) != float(investment.final_profit)):
+        raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
+
+    if float(total_amount) != float(investment.final_profit):
+        print(f"{total_amount=}")
+        print(f"{investment.final_profit=}")
+        raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
+
+    investment_report_is_exists = investment_report_list().filter(investor=investor, investment=investment)
+
+    if investment_report_is_exists.exists():
+        investment_report = investment_report_is_exists.last()
+        company_balance = company_balance_list().last()
+
+        company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
+        company_balance.save()
+
+        user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
+        user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
+        user_balance.save()
+
+        investment_report.investor = investor
+        investment_report.investment = investment
+        investment_report.amount_want_to_send_to_cart = amount_want_to_send_to_cart
+        investment_report.amount_want_to_keep_in_the_balance = amount_want_to_keep_in_the_balance
+        investment_report.amount_want_to_send_to_charity_fund = amount_want_to_send_to_charity_fund
+        investment_report.amount_want_to_send_to_debt_fund = amount_want_to_send_to_debt_fund
+        investment_report.note = note
+        investment_report.save()
+        
+        company_balance.debt_fund = float(company_balance.debt_fund) + float(amount_want_to_send_to_debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) + float(amount_want_to_send_to_charity_fund)
+        company_balance.save()
+
+        user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
+        user_balance.save()
+
+    else:
+        investment_report = InvestmentReport.objects.create(
+            investor=investor, investment=investment, amount_want_to_send_to_cart=amount_want_to_send_to_cart,
+            amount_want_to_keep_in_the_balance=amount_want_to_keep_in_the_balance, amount_want_to_send_to_charity_fund=amount_want_to_send_to_charity_fund,
+            amount_want_to_send_to_debt_fund=amount_want_to_send_to_debt_fund, note=note
+        )
+
+        company_balance = company_balance_list().last()
+        company_balance.debt_fund = float(company_balance.debt_fund) + float(amount_want_to_send_to_debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) + float(amount_want_to_send_to_charity_fund)
+        company_balance.save()
+
+        user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
+        user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
+        user_balance.save()
+    
+    return investment_report
+
+
+def investment_report_update(instance, **data) -> InvestmentReport:
+    investment_report = investment_report_list().filter(pk=instance.pk).update(**data)
+    return investment_report

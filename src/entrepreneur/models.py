@@ -43,25 +43,6 @@ class Entrepreneur(models.Model):
     amount_collected = models.DecimalField(_("Amount collected"), max_digits=10, decimal_places=2, default=0)
 
 
-class EntrepreneurCalculate(models.Model):
-    ...
-
-
 class EntrepreneurImages(models.Model):
     entrepreneur = models.ForeignKey(Entrepreneur, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(_("Entrepreneur Image"), upload_to="investor/entrepreneur_image/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])
-
-    def save(self, *args, **kwargs) -> None:
-        if self.image is not None:
-            compressed_image = compress(self.image)
-            self.image = compressed_image
-
-        super().save(*args, **kwargs)
-
-
-class DebtFund(models.Model):
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-
-class CharityFund(models.Model):
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    image = models.ImageField(_("Entrepreneur Image"), max_length=1000, upload_to="investor/entrepreneur_image/", validators=[FileExtensionValidator(['png', 'jpeg', 'jpg'])])

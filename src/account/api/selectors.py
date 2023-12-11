@@ -1,6 +1,6 @@
 from django.db.models.query import QuerySet
 from django.contrib.auth import get_user_model
-from account.models import Education, Experience, Investor, UserBalance
+from account.models import Education, Experience, Investor, UserBalance, CompanyBalance
 
 
 def user_list() -> QuerySet[get_user_model()]:
@@ -21,4 +21,8 @@ def education_list() -> QuerySet[Education]:
 
 def user_balance_list() -> QuerySet[UserBalance]:
     qs = UserBalance.objects.select_related('user').order_by("-pk").all()
+    return qs
+
+def company_balance_list() -> QuerySet[CompanyBalance]:
+    qs = CompanyBalance.objects.order_by("-pk").all()
     return qs
