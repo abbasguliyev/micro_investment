@@ -21,6 +21,9 @@ django-timezone-field==6.0.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.0
 drf-yasg==1.21.7
+gevent==23.9.1
+greenlet==3.0.2
+gunicorn==21.2.0
 inflection==0.5.1
 kombu==5.3.2
 packaging==23.2
@@ -41,3 +44,5 @@ tzdata==2023.3
 uritemplate==4.1.1
 vine==5.0.0
 wcwidth==0.2.8
+zope.event==5.0
+zope.interface==6.1

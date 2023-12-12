@@ -59,7 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        services.investor_update(instance=instance, **serializer.validated_data)
+        services.investor_update(request_user=request.user, instance=instance, **serializer.validated_data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, serializer_class=serializers.InvestorOutSerializer, filterset_class=None, pagination_class=None)
@@ -68,7 +68,7 @@ class UserViewSet(viewsets.ModelViewSet):
         investor = selectors.investor_list().filter(user=user).last()
         serializers = self.get_serializer(investor)
         return Response(serializers.data)
-
+    
     @action(methods=["POST"], detail=False, serializer_class=serializers.ChangePasswordSerializer, url_path="change-password")
     def change_password(self, request, *args, **kwargs):
         user = request.user
