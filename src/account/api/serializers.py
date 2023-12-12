@@ -111,6 +111,7 @@ class InvestorUpdateSerializer(serializers.ModelSerializer):
 
 class InvestorOutSerializer(serializers.ModelSerializer):
     user = UserOutSerializer(read_only=True)
+    references = UserOutSerializer(read_only=True, many=True)
 
     class Meta:
         model = Investor
