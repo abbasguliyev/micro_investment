@@ -44,7 +44,6 @@ def investment_create(
 
 
 def investment_update(instance, **data) -> Investment:
-    investment = investment_list().filter(pk=instance.pk).update(**data)
     amount = instance.amount
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
@@ -59,13 +58,44 @@ def investment_update(instance, **data) -> Investment:
         profit = float(amount) * float(instance.entrepreneur.profit_ratio) / 100
         final_profit = float(amount) + float(profit)
         data['profit'] = profit
-        data['final_profit'] = profit
+        data['final_profit'] = final_profit
     if data.get("is_submitted") is not None and instance.is_submitted is False and data.get("is_submitted") is True:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected + amount
         instance.entrepreneur.save()
+        user_balance = user_balance_list().filter(user=instance.investor.user).last()
+        if float(amount) == float(user_balance.balance):
+            instance.amount_must_send = 0
+            instance.amount_deducated_from_balance = float(amount)
+            instance.save()
+            user_balance.balance = float(user_balance.balance) - float(amount)
+            user_balance.save()
+        elif float(amount) > float(user_balance.balance):
+            instance.amount_must_send = float(amount) - float(user_balance.balance)
+            instance.amount_deducated_from_balance = float(user_balance.balance)
+            instance.save()
+            user_balance.balance = 0
+            user_balance.save()
+        elif float(amount) < float(user_balance.balance):
+            instance.amount_must_send = 0
+            instance.amount_deducated_from_balance = float(amount)
+            instance.save()
+            user_balance.balance = float(user_balance.balance) - float(amount)
+            user_balance.save()
+        
     if data.get("is_submitted") is not None and instance.is_submitted is True and data.get("is_submitted") is False:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
         instance.entrepreneur.save()
+        user_balance = user_balance_list().filter(user=instance.investor.user).last()
+        user_balance.balance = float(user_balance.balance) + float(instance.amount_deducated_from_balance)
+        user_balance.save()
+
+        instance.amount_must_send = 0
+        instance.amount_deducated_from_balance = 0
+        instance.save()
+        data['amount'] = instance.amount
+
+    investment = investment_list().filter(pk=instance.pk).update(**data)
+    
     return investment
 
 
@@ -90,8 +120,6 @@ def investment_report_create(
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
 
     if float(total_amount) != float(investment.final_profit):
-        print(f"{total_amount=}")
-        print(f"{investment.final_profit=}")
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
 
     investment_report_is_exists = investment_report_list().filter(investor=investor, investment=investment)

@@ -39,7 +39,7 @@ class UserOutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'email', 'is_staff', 'balance']
+        fields = ['first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -81,6 +81,8 @@ class InvestorCreateSerializer(serializers.ModelSerializer):
 class InvestorUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    is_active = serializers.BooleanField()
+    is_superuser = serializers.BooleanField()
     email = serializers.CharField()
 
     class Meta:
@@ -89,7 +91,7 @@ class InvestorUpdateSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'email', 'birthdate', 'address',
             'marital_status', 'employment_status', 'housing_status', 'phone_number',
             'credit_cart_number', 'debt_amount', 'monthly_income', 'references',
-            'profile_picture', 'about', 'business_activities'
+            'profile_picture', 'about', 'business_activities', 'is_active', 'is_superuser'
         ]
         extra_kwargs = {
             'first_name': {'required': False},
@@ -102,6 +104,8 @@ class InvestorUpdateSerializer(serializers.ModelSerializer):
             'profile_picture': {'required': False},
             'about': {'required': False},
             'business_activities': {'required': False},
+            'is_active': {'required': False},
+            'is_superuser': {'required': False}
         }
 
 

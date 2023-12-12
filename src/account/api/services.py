@@ -11,9 +11,12 @@ def user_create(
         *, first_name: str,
         last_name: str,
         email: str,
-        password: str
+        password: str,
+        is_active: bool
 ) -> get_user_model():
-    user = get_user_model().objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password)
+    user = get_user_model().objects.create_user(
+        email=email, first_name=first_name, last_name=last_name, is_active=is_active, password=password
+    )
     return user
 
 
@@ -44,7 +47,7 @@ def investor_create(
     user_exists = user_list().filter(email=email).exists()
     if user_exists:
         raise ValidationError({"detail": _("Zəhmət olmasa doğru emaili daxil etdiyinizdən əmin olun")})
-    user = user_create(first_name=first_name, last_name=last_name, email=email, password=password)
+    user = user_create(first_name=first_name, last_name=last_name, is_active=False, email=email, password=password)
     check_investor_instance_of_user = investor_list().filter(user=user)
     if check_investor_instance_of_user.count() == 0:
         investor = Investor.objects.create(
@@ -74,7 +77,7 @@ def investor_create(
     return investor
 
 
-def investor_update(instance, **data) -> Investor:
+def investor_update(request_user, instance, **data) -> Investor:
     user_data = dict()
     if data.get("first_name") is not None:
         user_data["first_name"] = data.pop("first_name")
@@ -82,6 +85,16 @@ def investor_update(instance, **data) -> Investor:
         user_data["last_name"] = data.pop("last_name")
     if data.get("email") is not None:
         user_data["email"] = data.pop("email")
+    if data.get("is_active") is not None:
+        if request_user.is_superuser is True:
+            user_data["is_active"] = data.pop("is_active")
+        else:
+            raise ValidationError({"detail": _("Sizin buna səlahiyyətiniz yoxdur")})
+    if data.get("is_superuser") is not None:
+        if request_user.is_superuser is True:
+            user_data["is_superuser"] = data.pop("is_superuser")
+        else:
+            raise ValidationError({"detail": _("Sizin buna səlahiyyətiniz yoxdur")})
     print(f"{data=}")
     if data.get('profile_picture'):
         profile_picture = data.pop("profile_picture")
