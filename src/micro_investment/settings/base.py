@@ -164,4 +164,5 @@ CORS_ALLOW_CREDENTIALS=True
 
 CORS_ALLOWED_ORIGINS = [
     'http://188.132.202.212:5173',
+    'https://halaekosistem.netlify.app'
 ]
