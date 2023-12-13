@@ -12,6 +12,8 @@ import os
 from django.core.wsgi import get_wsgi_application
 from micro_investment.settings.base import DEBUG
 
+print(f"{DEBUG=}")
+
 if DEBUG:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'micro_investment.settings.dev')
 else:

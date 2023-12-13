@@ -1,9 +1,6 @@
 from micro_investment.settings.base import *
 from datetime import timedelta
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
-
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(',')
 
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(',')

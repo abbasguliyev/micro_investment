@@ -1,9 +1,6 @@
 from micro_investment.settings.base import *
 from datetime import timedelta
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jb%wfsz-d!9378-7k&lyo*n-r@b)m28*z(xz7kx)(r4b^k3nr('
-
 # Application definition
 INSTALLED_APPS += ['debug_toolbar',]
 
