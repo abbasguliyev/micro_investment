@@ -101,7 +101,6 @@ services:
     env_file:
       - .env
     environment:
-      - DEBUG=0
       - SECRET_KEY=${SECRET_KEY}
       - CELERY_BROKER=${CELERY_BROKER}
       - RESULT_BACKEND=${CELERY_BACKEND}
