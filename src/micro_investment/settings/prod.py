@@ -1,6 +1,8 @@
 from micro_investment.settings.base import *
 from datetime import timedelta
 
+DEBUG = True
+
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(',')
 
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS").split(',')
