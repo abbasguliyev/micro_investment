@@ -1,6 +1,7 @@
 from micro_investment.settings.base import *
 from datetime import timedelta
 
+DEBUG = False
 # Application definition
 INSTALLED_APPS += ['debug_toolbar',]
 
