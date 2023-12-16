@@ -26,14 +26,14 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py makemigrations &&
              python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:80 --timeout 300 --worker-class=gevent --worker-connections=1000 --workers=5 micro_investment.wsgi"
+             gunicorn --bind 0.0.0.0:8000 --timeout 300 --worker-class=gevent --worker-connections=1000 --workers=5 micro_investment.wsgi"
     volumes:
       - ./src:/src
       - ./src/micro_investment:/src/micro_investment
       - ./src/static:/src/static
       - ./src/media:/src/media
     ports:
-      - "80:80"
+      - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - STATIC_ROOT=/app/static
