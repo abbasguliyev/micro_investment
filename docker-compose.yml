@@ -145,6 +145,12 @@ volumes:
     driver: local
   web:
     driver: local
+  html:
+    driver: local
+  vhost:
+    driver: local
+  acme:
+    driver: local
 
 networks:
   micro-investment-network:
