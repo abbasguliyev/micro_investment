@@ -34,7 +34,6 @@ services:
       - ./src/media:/src/media
     ports:
       - "8000:8000"
-      - "443:443"
     environment:
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - STATIC_ROOT=/app/static
