@@ -130,9 +130,9 @@ services:
       # - "443:443"
       - "81:80"
     depends_on:
-      - finddoctor_web
+      - micro_investment_web
     networks:
-      - find-doctor-network
+      - micro-investment-network
 
 volumes:
   redis_data:
