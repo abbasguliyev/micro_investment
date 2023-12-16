@@ -115,6 +115,24 @@ services:
       - micro_investment_web
       - micro_investment_redis
       - micro_investment_db
+  nginx:
+    restart: always
+    build: ./nginx
+    volumes:
+      - ./src/static:/src/static
+      - ./src/media:/src/media
+      # - /etc/ssl:/etc/ssl
+      # - ./certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - acme:/etc/acme.sh
+    ports:
+      # - "443:443"
+      - "81:80"
+    depends_on:
+      - finddoctor_web
+    networks:
+      - find-doctor-network
 
 volumes:
   redis_data:
