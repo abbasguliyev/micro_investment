@@ -119,16 +119,10 @@ services:
     restart: always
     build: ./nginx
     volumes:
-      - ./src/static:/src/static
-      - ./src/media:/src/media
-      # - /etc/ssl:/etc/ssl
-      # - ./certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
-      - vhost:/etc/nginx/vhost.d
-      - acme:/etc/acme.sh
+      - ./src:/usr/share/nginx/html
     ports:
       # - "443:443"
-      - "81:80"
+      - "8080:80"
     depends_on:
       - micro_investment_web
     networks:
@@ -145,12 +139,12 @@ volumes:
     driver: local
   web:
     driver: local
-  html:
-    driver: local
-  vhost:
-    driver: local
-  acme:
-    driver: local
+  # html:
+  #   driver: local
+  # vhost:
+  #   driver: local
+  # acme:
+  #   driver: local
 
 networks:
   micro-investment-network:
