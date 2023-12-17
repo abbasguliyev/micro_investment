@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 import environ
+from django.conf import settings
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +27,7 @@ environ.Env.read_env('../.env')
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = bool(env('DEBUG'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'entrepreneur.apps.EntrepreneurConfig',
     'investment.apps.InvestmentConfig',
+    'notification.apps.NotificationConfig',
 ]
 
 MIDDLEWARE = [
@@ -136,6 +140,43 @@ MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SIMPLE_JWT = {
+    # When set to True, if a refresh token is submitted to the TokenRefreshView, a new refresh token will be returned
+    # along with the new access token.
+    'ROTATE_REFRESH_TOKENS': True,
+    # refresh tokens submitted to the TokenRefreshView to be added to the blacklist
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'HS256',  # TWO types either HMAC  or RSA for HMAC 'HS256', 'HS384', 'HS512: SIGNING_KEY setting
+    # will be used as both the signing key and the verifying key.  asymmetric RSA RS256', 'RS384',
+    # 'RS512' SIGNING_KEY setting must be set to a string that contains an RSA private key. Likewise, the VERIFYING_KEY
+    'SIGNING_KEY': SECRET_KEY,  # content of generated tokens.
+    # The verifying key which is used to verify the content of generated tokens
+    'VERIFYING_KEY': None,
+    # The audience claim to be included in generated tokens and/or validated in decoded tokens
+    'AUDIENCE': None,
+    'ISSUER': None,  # issuer claim to be included in generated tokens
+
+    # Authorization: Bearer <token> ('Bearer', 'JWT')
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    # The database field from the user model that will be included in generated tokens to identify users.
+    'USER_ID_FIELD': 'id',
+    # value of 'user_id' would mean generated tokens include a “user_id” claim that contains the user’s identifier.
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    # The claim ad that is used to store a token’s type
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    # The claim ad that is used to store a token’s unique identifier.
+    'JTI_CLAIM': 'jti',
+    # which specifies how long access tokens are valid
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    # how long refresh tokens are valid.
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+}
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

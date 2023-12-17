@@ -39,7 +39,7 @@ class UserOutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance']
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance']
 
 
 class ChangePasswordSerializer(serializers.Serializer):

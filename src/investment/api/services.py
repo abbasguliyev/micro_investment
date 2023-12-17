@@ -4,6 +4,7 @@ from investment.models import Investment, InvestmentReport
 from investment.api.selectors import investment_list, investment_report_list
 from account.api.selectors import company_balance_list, user_balance_list
 from account.api.services import company_balance_create
+from notification.api.services import notification_create
 
 def investment_create(
         *, request_user, investor,
@@ -59,6 +60,9 @@ def investment_update(instance, **data) -> Investment:
         final_profit = float(amount) + float(profit)
         data['profit'] = profit
         data['final_profit'] = final_profit
+        
+        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyada dəyişiklik edildi, zəhmət olmasa profilinizə nəzər yetirin")
+    
     if data.get("is_submitted") is not None and instance.is_submitted is False and data.get("is_submitted") is True:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected + amount
         instance.entrepreneur.save()
@@ -81,6 +85,8 @@ def investment_update(instance, **data) -> Investment:
             instance.save()
             user_balance.balance = float(user_balance.balance) - float(amount)
             user_balance.save()
+
+        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiya təsdiq edildi")
         
     if data.get("is_submitted") is not None and instance.is_submitted is True and data.get("is_submitted") is False:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
@@ -93,6 +99,8 @@ def investment_update(instance, **data) -> Investment:
         instance.amount_deducated_from_balance = 0
         instance.save()
         data['amount'] = instance.amount
+
+        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
 
     investment = investment_list().filter(pk=instance.pk).update(**data)
     
