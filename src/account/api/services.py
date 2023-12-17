@@ -70,7 +70,8 @@ def investor_create(
             business_activities=business_activities
         )
 
-    if references is not None:
+    print(f"{references=}")
+    if references is not None and references != []:
         investor.references.set(references.split(","))
         investor.save
 
