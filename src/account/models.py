@@ -66,7 +66,7 @@ class Investor(models.Model):
     marital_status = models.CharField(_("Martial Status"), max_length=50, choices=enums.MartialStatus.choices, default=enums.MartialStatus.SINGLE)
     employment_status = models.CharField(_("Employment Status"), max_length=50, choices=enums.EmploymentStatus.choices, default=enums.EmploymentStatus.WORKING)
     housing_status = models.CharField(_("Housing Status"), max_length=50, choices=enums.HousingStatus.choices, default=enums.HousingStatus.OWN_HOME)
-    phone_number = PhoneNumberField(verbose_name=_("Phone Number"), blank=True)
+    phone_number = models.CharField(_("Phone number"), max_length=255)
     credit_cart_number = models.CharField(_("Credit Cart Number"), max_length=100)
     debt_amount = models.DecimalField(_("Debt Amount"), max_digits=10, decimal_places=2, default=0)
     monthly_income = models.DecimalField(_("Monthly Income"), max_digits=10, decimal_places=2, default=0)

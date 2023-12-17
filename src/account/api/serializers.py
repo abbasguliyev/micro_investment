@@ -53,7 +53,7 @@ class InvestorCreateSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField()
-    references = serializers.CharField()
+    references = serializers.CharField(required=False)
 
     class Meta:
         model = Investor
