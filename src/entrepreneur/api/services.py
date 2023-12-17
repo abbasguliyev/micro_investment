@@ -5,11 +5,12 @@ from django.utils.translation import gettext_lazy as _
 from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list, entrepreneur_images_list
 from micro_investment.validators import compress
-
+from notification.api.services import notification_create
 
 def entrepreneur_create(
     *, owner,
     project_name: str,
+    start_date,
     end_date,
     description: str,
     count: int = 1,
@@ -41,7 +42,7 @@ def entrepreneur_create(
     profit_ratio = float("%.2f" % profit_ratio)
 
     entrepreneur = Entrepreneur.objects.create(
-        owner=owner, project_name=project_name, end_date=end_date, description=description,
+        owner=owner, project_name=project_name, start_date=start_date, end_date=end_date, description=description,
         count=count, purchase_price=purchase_price, sale_price=sale_price,
         platform_cost_percentage=platform_cost_percentage, investor_share_percentage=investor_share_percentage,
         entrepreneur_share_percentage=entrepreneur_share_percentage, debt_to_the_fund_percentage=debt_to_the_fund_percentage,
@@ -58,6 +59,8 @@ def entrepreneur_update(instance, **data) -> Entrepreneur:
     if data.get("is_finished") is not None and instance.is_finished == False and data.get("is_finished") == True:
         data["finished_date"] = datetime.date.today()
         data["is_active"] = False
+
+        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur} sifarişi yekunlaşdı")
 
     entrepreneur = entrepreneur_list().filter(pk=instance.pk).update(**data)
     return entrepreneur

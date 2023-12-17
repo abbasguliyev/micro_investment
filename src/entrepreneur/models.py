@@ -1,13 +1,13 @@
+import django
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
 from micro_investment.validators import compress
 
-
 class Entrepreneur(models.Model):
     owner = models.ForeignKey("account.Investor", on_delete=models.CASCADE, related_name="entrepreneurs", help_text="Formaçı")
     project_name = models.CharField(_("Project name"), max_length=255, help_text="Proyekt adı")
-    start_date = models.DateField(_("Start date"), auto_now_add=True, help_text="Başlanğıc tarixi")
+    start_date = models.DateField(_("Start date"), default=django.utils.timezone.now, help_text="Başlanğıc tarixi")
     end_date = models.DateField(_("End date"), help_text="Bitmə tarixi")
     finished_date = models.DateField(_("Finished date"), null=True, blank=True, help_text="Yekunlaşdığı tarix")
     description = models.TextField(help_text="Açıqlama")

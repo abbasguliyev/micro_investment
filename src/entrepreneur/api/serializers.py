@@ -12,7 +12,7 @@ class EntrepreneurCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entrepreneur
         fields = [
-            'project_name', 'end_date', 'description',
+            'project_name', 'start_date', 'end_date', 'description',
             'count', 'purchase_price', 'sale_price', 'platform_cost_percentage',
             'investor_share_percentage', 'entrepreneur_share_percentage', 'debt_to_the_fund_percentage',
             'charity_to_the_fund_percentage'
@@ -20,6 +20,7 @@ class EntrepreneurCreateSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             'project_name': {'required': True},
+            'start_date': {'required': True},
             'end_date': {'required': True},
             'count': {'required': True},
             'purchase_price': {'required': True},
