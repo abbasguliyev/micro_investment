@@ -151,7 +151,7 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',  # TWO types either HMAC  or RSA for HMAC 'HS256', 'HS384', 'HS512: SIGNING_KEY setting
     # will be used as both the signing key and the verifying key.  asymmetric RSA RS256', 'RS384',
     # 'RS512' SIGNING_KEY setting must be set to a string that contains an RSA private key. Likewise, the VERIFYING_KEY
-    'SIGNING_KEY': settings.SECRET_KEY,  # content of generated tokens.
+    'SIGNING_KEY': SECRET_KEY,  # content of generated tokens.
     # The verifying key which is used to verify the content of generated tokens
     'VERIFYING_KEY': None,
     # The audience claim to be included in generated tokens and/or validated in decoded tokens
