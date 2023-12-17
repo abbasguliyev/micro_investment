@@ -115,18 +115,18 @@ services:
       - micro_investment_web
       - micro_investment_redis
       - micro_investment_db
-  nginx:
-    restart: always
-    build: ./nginx
-    volumes:
-      - ./src:/usr/share/nginx/html
-    ports:
-      # - "443:443"
-      - "8080:80"
-    depends_on:
-      - micro_investment_web
-    networks:
-      - micro-investment-network
+  # nginx:
+  #   restart: always
+  #   build: ./nginx
+  #   volumes:
+  #     - ./src:/usr/share/nginx/html
+  #   ports:
+  #     # - "443:443"
+  #     - "8080:80"
+  #   depends_on:
+  #     - micro_investment_web
+  #   networks:
+  #     - micro-investment-network
 
 volumes:
   redis_data:
