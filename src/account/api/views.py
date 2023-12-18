@@ -7,6 +7,7 @@ from rest_framework.views import Response
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -14,8 +15,13 @@ from account.api import serializers, selectors, services, utils, filters
 
 
 class LoginView(TokenObtainPairView):
+    class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+        default_error_messages = {
+            'no_active_account': _('Hesabı təsdiqlənmiş istifadəçi tapılmadı')
+        }
     permission_classes = (permissions.AllowAny,)
-
+    serializer_class = MyTokenObtainPairSerializer
+    
     def post(self, request, *args, **kwargs) -> Response:
         data = super().post(request, *args, **kwargs)
 

@@ -35,9 +35,34 @@ class EntrepreneurUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Entrepreneur
         fields = [
+            'project_name', 'start_date', 'end_date', 'description',
+            'count', 'purchase_price', 'sale_price', 'total_investment', 
+            'gross_income', 'platform_cost_percentage', 'platform_cost', 'final_profit', 
+            'investor_share_percentage', 'investor_share', 'entrepreneur_share_percentage', 'entrepreneur_share',
+            'debt_to_the_fund_percentage', 'debt_to_the_fund',
+            'charity_to_the_fund_percentage', 'charity_to_the_fund', 'profit_ratio', 
             'is_active', 'finished_date', 'amount_collected', 'is_finished'
         ]
         extra_kwargs = {
+            'project_name': {'required': False},
+            'start_date': {'required': False},
+            'end_date': {'required': False},
+            'count': {'required': False},
+            'purchase_price': {'required': False},
+            'sale_price': {'required': False},
+            'gross_income': {'required': False},
+            'platform_cost_percentage': {'required': False},
+            'platform_cost': {'required': False},
+            'final_profit': {'required': False},
+            'investor_share_percentage': {'required': False},
+            'investor_share': {'required': False},
+            'entrepreneur_share_percentage': {'required': False},
+            'entrepreneur_share': {'required': False},
+            'debt_to_the_fund_percentage': {'required': False},
+            'debt_to_the_fund': {'required': False},
+            'charity_to_the_fund_percentage': {'required': False},
+            'charity_to_the_fund': {'required': False},
+            'profit_ratio': {'required': False},
             'is_active': {'required': False},
             'finished_date': {'required': False},
             'amount_collected': {'required': False},
