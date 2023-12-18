@@ -141,6 +141,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
+
 SIMPLE_JWT = {
     # When set to True, if a refresh token is submitted to the TokenRefreshView, a new refresh token will be returned
     # along with the new access token.
@@ -152,8 +162,6 @@ SIMPLE_JWT = {
     # will be used as both the signing key and the verifying key.  asymmetric RSA RS256', 'RS384',
     # 'RS512' SIGNING_KEY setting must be set to a string that contains an RSA private key. Likewise, the VERIFYING_KEY
     'SIGNING_KEY': SECRET_KEY,  # content of generated tokens.
-    # The verifying key which is used to verify the content of generated tokens
-    'VERIFYING_KEY': None,
     # The audience claim to be included in generated tokens and/or validated in decoded tokens
     'AUDIENCE': None,
     'ISSUER': None,  # issuer claim to be included in generated tokens
@@ -172,20 +180,9 @@ SIMPLE_JWT = {
     # The claim ad that is used to store a token’s unique identifier.
     'JTI_CLAIM': 'jti',
     # which specifies how long access tokens are valid
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
     # how long refresh tokens are valid.
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
-}
-
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
 }
 
 SWAGGER_SETTINGS = {
