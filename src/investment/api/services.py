@@ -48,7 +48,7 @@ def investment_update(instance, **data) -> Investment:
     amount = instance.amount
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
-    if data.get("amount") is not None and data.get("is_submitted") is True:
+    if data.get("amount") is not None:
         amount = data.get("amount")
         if amount <= 0:
             raise ValidationError({"detail": _("Məbləğ 0-dan böyük olmalıdır!")})

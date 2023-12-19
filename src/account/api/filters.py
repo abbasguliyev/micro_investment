@@ -6,11 +6,15 @@ from account.models import Investor, Experience, Education
 
 class InvestorFilter(django_filters.FilterSet):
     fullname = django_filters.CharFilter(method="fullname_filter", label="fullname")
+    is_active = django_filters.BooleanFilter(method="is_active_filter", label="is_active")
 
     def fullname_filter(self, queryset, name, value):
         qs = queryset.annotate(fullname=Concat('user__first_name', V(' '), 'user__last_name')).filter(fullname__icontains=value)
         return qs
 
+    def is_active_filter(self, queryset, name, value):
+        qs = queryset.filter(user__is_active=value)
+        return qs
 
     class Meta:
         model = Investor
