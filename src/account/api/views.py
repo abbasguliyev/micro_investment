@@ -85,6 +85,14 @@ class UserViewSet(viewsets.ModelViewSet):
         user.set_password(serializer.data.get("new_password"))
         user.save()
         return Response(data={'detail': _("Password updated successfully")}, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = instance.user
+        print(f"{user=}")
+        self.perform_destroy(instance)
+        selectors.user_list().filter(pk=user.id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ExperienceViewSet(viewsets.ModelViewSet):
