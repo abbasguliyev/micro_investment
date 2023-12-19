@@ -152,37 +152,36 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    # When set to True, if a refresh token is submitted to the TokenRefreshView, a new refresh token will be returned
-    # along with the new access token.
-    'ROTATE_REFRESH_TOKENS': True,
-    # refresh tokens submitted to the TokenRefreshView to be added to the blacklist
-    'BLACKLIST_AFTER_ROTATION': True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=6),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
 
-    'ALGORITHM': 'HS256',  # TWO types either HMAC  or RSA for HMAC 'HS256', 'HS384', 'HS512: SIGNING_KEY setting
-    # will be used as both the signing key and the verifying key.  asymmetric RSA RS256', 'RS384',
-    # 'RS512' SIGNING_KEY setting must be set to a string that contains an RSA private key. Likewise, the VERIFYING_KEY
-    'SIGNING_KEY': SECRET_KEY,  # content of generated tokens.
-    # The audience claim to be included in generated tokens and/or validated in decoded tokens
-    'AUDIENCE': None,
-    'ISSUER': None,  # issuer claim to be included in generated tokens
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": "",
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JSON_ENCODER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
 
-    # Authorization: Bearer <token> ('Bearer', 'JWT')
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    # The database field from the user model that will be included in generated tokens to identify users.
-    'USER_ID_FIELD': 'id',
-    # value of 'user_id' would mean generated tokens include a “user_id” claim that contains the user’s identifier.
-    'USER_ID_CLAIM': 'user_id',
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    # The claim ad that is used to store a token’s type
-    'TOKEN_TYPE_CLAIM': 'token_type',
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
 
-    # The claim ad that is used to store a token’s unique identifier.
-    'JTI_CLAIM': 'jti',
-    # which specifies how long access tokens are valid
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
-    # how long refresh tokens are valid.
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=6),
 }
 
 SWAGGER_SETTINGS = {

@@ -8,7 +8,7 @@ def user_list() -> QuerySet[get_user_model()]:
     return qs
 
 def investor_list() -> QuerySet[Investor]:
-    qs = Investor.objects.select_related('user').prefetch_related('references').order_by("-pk").all()
+    qs = Investor.objects.select_related('user').prefetch_related('references').order_by("user__first_name").all()
     return qs
 
 def experience_list() -> QuerySet[Experience]:
