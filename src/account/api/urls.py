@@ -12,5 +12,6 @@ router.register(r'', UserViewSet, basename='user')
 urlpatterns = [
     path('login/', LoginView.as_view(), name="login"),
     path('refresh/', jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
+    path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('', include(router.urls)),
 ]

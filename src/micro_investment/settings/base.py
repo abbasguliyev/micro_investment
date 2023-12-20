@@ -51,12 +51,15 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'corsheaders',
+    
 
     # apps
     'account.apps.AccountConfig',
     'entrepreneur.apps.EntrepreneurConfig',
     'investment.apps.InvestmentConfig',
     'notification.apps.NotificationConfig',
+
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -144,6 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
@@ -212,3 +216,15 @@ if DEBUG == False:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS=True
     SECURE_HSTS_PRELOAD=True
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yaminsavalanli@gmail.com'
+EMAIL_HOST_PASSWORD = 'ckmw vvrm yjdu mtdm'
+
+DJANGO_REST_PASSWORDRESET = {
+    'RESET_PASSWORD_TOKEN_TIMEOUT_DAYS': 1,
+}
