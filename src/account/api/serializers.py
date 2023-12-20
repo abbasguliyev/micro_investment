@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
-from account.api.selectors import user_list, user_balance_list
+from account.api.selectors import user_list, user_balance_list, investor_list
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -41,10 +41,11 @@ class UserOutSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance']
 
-
 class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
-    old_password = serializers.CharField(required=True)
+    investor = serializers.PrimaryKeyRelatedField(
+        queryset=investor_list(), write_only=True, allow_null=True, allow_empty=True
+    )
     new_password = serializers.CharField(required=True)
 
 
