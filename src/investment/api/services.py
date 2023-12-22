@@ -108,17 +108,18 @@ def investment_update(instance, **data) -> Investment:
     return investment
 
 def investment_delete(instance):
-    instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
-    instance.entrepreneur.save()
-    user_balance = user_balance_list().filter(user=instance.investor.user).last()
-    user_balance.balance = float(user_balance.balance) + float(instance.amount_deducated_from_balance)
-    user_balance.save()
+    if instance.is_submitted == True:
+        instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
+        instance.entrepreneur.save()
+        user_balance = user_balance_list().filter(user=instance.investor.user).last()
+        user_balance.balance = float(user_balance.balance) + float(instance.amount_deducated_from_balance)
+        user_balance.save()
 
-    instance.amount_must_send = 0
-    instance.amount_deducated_from_balance = 0
-    instance.save()
+        instance.amount_must_send = 0
+        instance.amount_deducated_from_balance = 0
+        instance.save()
 
-    notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
+        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
 
     instance.delete()
 
