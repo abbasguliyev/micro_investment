@@ -48,7 +48,7 @@ def investment_update(instance, **data) -> Investment:
     amount = instance.amount
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
-    if data.get("amount") is not None:
+    if data.get("amount") is not None and  instance.is_submitted is False:
         amount = data.get("amount")
         if amount <= 0:
             raise ValidationError({"detail": _("Məbləğ 0-dan böyük olmalıdır!")})
@@ -61,6 +61,7 @@ def investment_update(instance, **data) -> Investment:
         data['profit'] = profit
         data['final_profit'] = final_profit
         
+
         notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyada dəyişiklik edildi, zəhmət olmasa profilinizə nəzər yetirin")
     
     if data.get("is_submitted") is not None and instance.is_submitted is False and data.get("is_submitted") is True:
