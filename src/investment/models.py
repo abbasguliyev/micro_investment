@@ -14,7 +14,7 @@ class Investment(models.Model):
     is_submitted = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ('-pk',)
+        ordering = ('investor__user__first_name',)
 
 
 class InvestmentReport(models.Model):
@@ -27,4 +27,4 @@ class InvestmentReport(models.Model):
     note = models.TextField(null=True, blank=True)
 
     class Meta:
-        ordering = ('-pk',)
+        ordering = ('investor__user__first_name',)

@@ -3,7 +3,7 @@ from entrepreneur.models import Entrepreneur, EntrepreneurImages
 
 
 def entrepreneur_list() -> QuerySet[Entrepreneur]:
-    qs = Entrepreneur.objects.select_related('owner').order_by("-project_name").all()
+    qs = Entrepreneur.objects.select_related('owner').order_by("project_name").all()
     return qs
 
 
