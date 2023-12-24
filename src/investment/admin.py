@@ -10,4 +10,4 @@ class InvestmentAdmin(admin.ModelAdmin):
 @admin.register(InvestmentReport)
 class InvestmentReportAdmin(admin.ModelAdmin):
     list_display = ('id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
-                    'amount_want_to_send_to_debt_fund', 'note')
+                    'amount_want_to_send_to_debt_fund', 'note', 'is_amount_sended_to_investor')

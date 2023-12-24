@@ -98,25 +98,12 @@ class InvestmentReportCreateSerializer(serializers.ModelSerializer):
 
 
 class InvestmentReportUpdateSerializer(serializers.ModelSerializer):
-    investor = serializers.PrimaryKeyRelatedField(
-        queryset=investor_list(), write_only=True
-    )
-    investment = serializers.PrimaryKeyRelatedField(
-        queryset=investment_list(), write_only=True
-    )
 
     class Meta:
         model = InvestmentReport
-        fields = ['investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
-                  'amount_want_to_send_to_debt_fund', 'note']
+        fields = ['is_amount_sended_to_investor']
         extra_kwargs = {
-            'investor': {'required': False},
-            'investment': {'required': False},
-            'amount_want_to_send_to_cart': {'required': False},
-            'amount_want_to_keep_in_the_balance': {'required': False},
-            'amount_want_to_send_to_charity_fund': {'required': False},
-            'amount_want_to_send_to_debt_fund': {'required': False},
-            'note': {'required': False}
+            'is_amount_sended_to_investor': {'required': False}
         }
 
 
@@ -145,4 +132,4 @@ class InvestmentReportOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvestmentReport
         fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
-                  'amount_want_to_send_to_debt_fund', 'note']
+                  'amount_want_to_send_to_debt_fund', 'note', 'is_amount_sended_to_investor']

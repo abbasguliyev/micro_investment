@@ -25,6 +25,7 @@ class InvestmentReport(models.Model):
     amount_want_to_send_to_charity_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     amount_want_to_send_to_debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     note = models.TextField(null=True, blank=True)
+    is_amount_sended_to_investor = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('investor__user__first_name',)
