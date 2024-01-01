@@ -76,45 +76,59 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
             model = EntrepreneurImages
             fields = ['id', 'image']
 
-    class InvestmentNestedSerializer(serializers.ModelSerializer):
-        class InvestmentInvestorInlineSerializer(serializers.ModelSerializer):
-            class InvestmentInvestorUserInlineSerializer(serializers.ModelSerializer):
-                balance = serializers.SerializerMethodField('get_balance')
-
-                def get_balance(self, instance):
-                    balance_list = user_balance_list().filter(user=instance).last()
-                    if balance_list is not None:
-                        return balance_list.balance
-                    else:
-                        return 0
-                    
-                class Meta:
-                    model = get_user_model()
-                    fields = ['id', 'first_name', 'last_name', 'balance']
-
-            user = InvestmentInvestorUserInlineSerializer()
-
+    class InlineEntrepreneurOwnerSerializer(serializers.ModelSerializer):
+        class EntrepreneurInlineUserOutSerializer(serializers.ModelSerializer):
             class Meta:
-                model = Investor
-                fields = ['id', 'user']
+                model = get_user_model()
+                fields = ['id', 'first_name', 'last_name', 'email']
 
-        class InvestmentReportInlineSerializer(serializers.ModelSerializer):
-            class Meta:
-                model = InvestmentReport
-                fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
-                          'amount_want_to_send_to_debt_fund', 'note']
-
-        investor = InvestmentInvestorInlineSerializer()
-        investment_report = InvestmentReportInlineSerializer(many=True)
+        user = EntrepreneurInlineUserOutSerializer(read_only=True)
 
         class Meta:
-            model = Investment
-            fields = ['id', 'investor', 'entrepreneur', 'amount', 'amount_must_send', 'amount_deducated_from_balance', 'profit', 'final_profit', 'investment_date',
-                      'is_submitted', 'investment_report']
+            model = Investor
+            fields = [
+                'id', 'user'
+            ]
 
-    owner = InvestorOutSerializer()
+    # class InvestmentNestedSerializer(serializers.ModelSerializer):
+    #     class InvestmentInvestorInlineSerializer(serializers.ModelSerializer):
+    #         class InvestmentInvestorUserInlineSerializer(serializers.ModelSerializer):
+    #             balance = serializers.SerializerMethodField('get_balance')
+
+    #             def get_balance(self, instance):
+    #                 balance_list = user_balance_list().filter(user=instance).last()
+    #                 if balance_list is not None:
+    #                     return balance_list.balance
+    #                 else:
+    #                     return 0
+                    
+    #             class Meta:
+    #                 model = get_user_model()
+    #                 fields = ['id', 'first_name', 'last_name', 'balance']
+
+    #         user = InvestmentInvestorUserInlineSerializer()
+
+    #         class Meta:
+    #             model = Investor
+    #             fields = ['id', 'user']
+
+    #     class InvestmentReportInlineSerializer(serializers.ModelSerializer):
+    #         class Meta:
+    #             model = InvestmentReport
+    #             fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
+    #                       'amount_want_to_send_to_debt_fund', 'note']
+
+    #     investor = InvestmentInvestorInlineSerializer()
+    #     investment_report = InvestmentReportInlineSerializer(many=True)
+
+    #     class Meta:
+    #         model = Investment
+    #         fields = ['id', 'investor', 'entrepreneur', 'amount', 'amount_must_send', 'amount_deducated_from_balance', 'profit', 'final_profit', 'investment_date',
+    #                   'is_submitted', 'investment_report']
+
+    owner = InlineEntrepreneurOwnerSerializer()
     images = EntrepreneurNestedImagesSerializer(many=True)
-    investments = InvestmentNestedSerializer(many=True)
+    # investments = InvestmentNestedSerializer(many=True)
 
     class Meta:
         model = Entrepreneur

@@ -18,7 +18,7 @@ class InvestmentCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Investment
-        fields = ['investor', 'entrepreneur', 'amount', 'is_submitted']
+        fields = ['investor', 'entrepreneur', 'amount', 'is_submitted', 'is_from_debt_fund', 'amount_from_debt_fund']
 
 
 class InvestmentUpdateSerializer(serializers.ModelSerializer):
@@ -31,12 +31,15 @@ class InvestmentUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Investment
-        fields = ['investor', 'entrepreneur', 'amount', 'is_submitted']
+        fields = ['investor', 'entrepreneur', 'amount', 'is_submitted', 'is_amount_sended', 'is_amount_sended_submitted', 'is_from_debt_fund', 'amount_from_debt_fund']
         extra_kwargs = {
             'investor': {'required': False},
             'entrepreneur': {'required': False},
             'amount': {'required': False},
-            'is_submitted': {'required': False}
+            'is_submitted': {'required': False},
+            'is_amount_sended': {'required': False},
+            'is_from_debt_fund': {'required': False},
+            'amount_from_debt_fund': {'required': False},
         }
 
 
@@ -80,7 +83,7 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Investment
         fields = ['id', 'investor', 'entrepreneur', 'amount', 'amount_must_send', 'amount_deducated_from_balance', 'profit', 'final_profit', 'investment_date',
-                  'is_submitted', 'investment_report']
+                  'is_submitted', 'investment_report', 'is_amount_sended', 'is_amount_sended_submitted', 'is_from_debt_fund', 'amount_from_debt_fund']
 
 
 class InvestmentReportCreateSerializer(serializers.ModelSerializer):
