@@ -12,6 +12,10 @@ class Investment(models.Model):
     final_profit = models.DecimalField(_('Final Profit'), max_digits=10, decimal_places=2)
     investment_date = models.DateField(_("Investment date"), auto_now_add=True, help_text="Yatırım tarixi")
     is_submitted = models.BooleanField(default=False)
+    is_amount_sended = models.BooleanField(default=False)
+    is_amount_sended_submitted = models.BooleanField(default=False)
+    is_from_debt_fund = models.BooleanField(default=False)
+    amount_from_debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
         ordering = ('investor__user__first_name',)
