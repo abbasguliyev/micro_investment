@@ -27,8 +27,9 @@ def investment_create(
     if has_investment:
         raise ValidationError({"detail": _("Eyni sifarişə yalnız 1 dəfə yatırım edə bilərsiniz")})
     
-    if float(amount_from_debt_fund) > float(amount):
-        raise ValidationError({"detail": _("Borc fondundan qarşılanacaq məbləğ yekun məbləğdən çox ola bilməz")})
+    if is_from_debt_fund == True:
+        if float(amount_from_debt_fund) > float(amount):
+            raise ValidationError({"detail": _("Borc fondundan qarşılanacaq məbləğ yekun məbləğdən çox ola bilməz")})
 
     if is_from_debt_fund == False:
         amount_from_debt_fund = 0
