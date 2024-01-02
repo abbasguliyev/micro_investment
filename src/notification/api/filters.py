@@ -5,5 +5,6 @@ class NotificationFilter(django_filters.FilterSet):
     class Meta:
         model = Notification
         fields = {
-            'user': ['exact']
+            'user': ['exact'],
+            'is_read': ['exact']
         }
