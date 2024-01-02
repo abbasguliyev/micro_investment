@@ -11,6 +11,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.NotificationOutSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NotificationFilter
+    permission_classes = (permissions.AllowAny,)
 
     def get_serializer_class(self):
         if self.action == 'create':
