@@ -258,21 +258,31 @@ def investment_report_create(
         raise ValidationError({'detail': _('Başqa investorun investisiya hesabatını edə bilməzsiniz')})
 
     if investment.is_from_debt_fund == True:
+        print("Burdayam")
         company_balance.debt_fund = float(company_balance.debt_fund) + float(investment.amount_from_debt_fund)
         company_balance.save()
         amount_want_to_send_to_debt_fund = 0
-        amount_want_to_send_to_charity_fund = 0
+        # amount_want_to_send_to_charity_fund = 0
         investment.final_profit = float(investment.final_profit) - float(investment.amount_from_debt_fund)
 
+    print(f"{amount_want_to_send_to_cart=}")
+    print(f"{amount_want_to_keep_in_the_balance=}")
+    print(f"{amount_want_to_send_to_charity_fund=}")
+    print(f"{amount_want_to_send_to_debt_fund=}")
     total_amount = float(amount_want_to_send_to_cart) + float(amount_want_to_keep_in_the_balance) + float(amount_want_to_send_to_charity_fund) + float(amount_want_to_send_to_debt_fund)
     print(f"{total_amount=}")
-    print(f"{investment.final_profit=}")
 
-    if (amount_want_to_send_to_cart == 0 and amount_want_to_keep_in_the_balance == 0 and amount_want_to_send_to_charity_fund == 0 and amount_want_to_send_to_debt_fund == 0) and (float(total_amount) != float(investment.final_profit)):
+    total_amount = float("{:.2f}".format(total_amount))
+    final_profit = float("{:.2f}".format(investment.final_profit))
+
+    print(f"{total_amount=}")
+    print(f"{final_profit=}")
+
+    if (amount_want_to_send_to_cart == 0 and amount_want_to_keep_in_the_balance == 0 and amount_want_to_send_to_charity_fund == 0 and amount_want_to_send_to_debt_fund == 0) and (float(total_amount) != float(final_profit)):
         logger.error('Bütün məbləğlər 0 daxil edilib')
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
 
-    if float(total_amount) != float(investment.final_profit):
+    if float(total_amount) != float(final_profit):
         logger.error('Yazılan məbləğlər ümumi gəlirə bərabər deyil')
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
     
@@ -282,10 +292,10 @@ def investment_report_create(
         investment_report = investment_report_is_exists.last()
         company_balance = company_balance_list().last()
 
-        if investment.is_from_debt_fund == False:
-            company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
-            company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
-            company_balance.save()
+        # if investment.is_from_debt_fund == False:
+        company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
+        company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
+        company_balance.save()
 
         user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
         user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
