@@ -292,6 +292,9 @@ def investment_report_create(
         investment_report = investment_report_is_exists.last()
         company_balance = company_balance_list().last()
 
+        if investment_report.is_amount_sended_to_investor == True:
+            raise ValidationError({'detail': _('Hesabat təsdiqləndiyi üçün dəyişiklik edə bilməzsiniz!')})
+
         # if investment.is_from_debt_fund == False:
         company_balance.debt_fund = float(company_balance.debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
         company_balance.charity_fund = float(company_balance.charity_fund) - float(investment_report.amount_want_to_send_to_charity_fund)
