@@ -29,7 +29,7 @@ def entrepreneur_create(
         is_active = False
     total_investment = count * purchase_price
     gross_income = count * sale_price
-    platform_cost = (gross_income - total_investment) * 2 / 100
+    platform_cost = (gross_income - total_investment) * int(platform_cost_percentage) / 100
     final_profit = gross_income - total_investment - platform_cost
     investor_share = final_profit * investor_share_percentage / 100
     entrepreneur_share = final_profit * entrepreneur_share_percentage / 100

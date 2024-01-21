@@ -14,7 +14,7 @@ class InvestmentFilter(django_filters.FilterSet):
         model = Investment
         fields = {
             'investor': ['exact'],
-            'entrepreneur': ['exact'],
+            'entrepreneur__project_name': ['icontains'],
             'investment_date': ['exact'],
             'is_submitted': ['exact'],
             'is_amount_sended': ['exact'],

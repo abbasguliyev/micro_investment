@@ -1,8 +1,9 @@
 from django.db.models import Q
 from django.db.models import Value as V
-from django.db.models.functions import Concat   
+from django.db.models.functions import Concat
 import django_filters
 from account.models import Investor, Experience, Education
+
 
 class InvestorFilter(django_filters.FilterSet):
     fullname = django_filters.CharFilter(method="fullname_filter", label="fullname")
@@ -27,6 +28,7 @@ class InvestorFilter(django_filters.FilterSet):
             'monthly_income': ['exact', 'gte', 'lte']
         }
 
+
 class ExperienceFilter(django_filters.FilterSet):
     class Meta:
         model = Experience
@@ -40,6 +42,7 @@ class ExperienceFilter(django_filters.FilterSet):
             'is_continue': ['exact']
         }
 
+
 class EducationFilter(django_filters.FilterSet):
     class Meta:
         model = Education
@@ -52,4 +55,3 @@ class EducationFilter(django_filters.FilterSet):
             'end_year': ['exact', 'gte', 'lte'],
             'is_continue': ['exact']
         }
-

@@ -26,16 +26,16 @@ class Entrepreneur(models.Model):
 
     final_profit = models.DecimalField(_("Final profit"), max_digits=10, decimal_places=2, default=0, help_text="Yekun Mənfəət")
 
-    investor_share_percentage = models.PositiveIntegerField(_("Investor share percentage"), default=25, help_text="İnvestorun payı faizi")
+    investor_share_percentage = models.PositiveIntegerField(_("Investor share percentage"), default=30, help_text="İnvestorun payı faizi")
     investor_share = models.DecimalField(_("Investor share"), max_digits=10, decimal_places=2, default=0, help_text="İnvestorun payı")
 
-    entrepreneur_share_percentage = models.PositiveIntegerField(_("Entrepreneur share percentage"), default=63, help_text="Formaçının payı faizi")
+    entrepreneur_share_percentage = models.PositiveIntegerField(_("Entrepreneur share percentage"), default=65, help_text="Formaçının payı faizi")
     entrepreneur_share = models.DecimalField(_("Entrepreneur share"), max_digits=10, decimal_places=2, default=0, help_text="Formaçının payı")
 
     debt_to_the_fund_percentage = models.PositiveIntegerField(_("Debt to the fund percentage"), default=5, help_text="Fonda borc faizi")
     debt_to_the_fund = models.DecimalField(_("Debt to the fund"), max_digits=10, decimal_places=2, default=0, help_text="Fonda borc")
 
-    charity_to_the_fund_percentage = models.PositiveIntegerField(_("Charity to the fund percentage"), default=7, help_text="Fonda sədəqə faizi")
+    charity_to_the_fund_percentage = models.PositiveIntegerField(_("Charity to the fund percentage"), default=0, help_text="Fonda sədəqə faizi")
     charity_to_the_fund = models.DecimalField(_("Charity to the fund"), max_digits=10, decimal_places=2, default=0, help_text="Fonda sədəqə")
 
     profit_ratio = models.FloatField(_("Profit ratio"), default=0, help_text="Mənfəət əmsalı")
