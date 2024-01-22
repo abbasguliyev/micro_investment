@@ -175,19 +175,21 @@ def experience_update(instance, **data) -> Experience:
     return experience
 
 
-def user_balance_create(*, user, balance: float = 0) -> UserBalance:
+def user_balance_create(*, user, balance: float = 0, money_in_debt_fund: float = 0) -> UserBalance:
     user_balance_instance = user_balance_list().filter(user=user)
 
     if user_balance_instance.exists():
         user_balance = user_balance_instance.last()
         user_balance.balance = float(user_balance.balance) + float(balance)
+        user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) + float(money_in_debt_fund)
         user_balance.save()
     else:
-        user_balance = UserBalance.objects.create(user=user, balance=balance)
+        user_balance = UserBalance.objects.create(user=user, balance=balance, money_in_debt_fund=money_in_debt_fund)
         user_balance.full_clean()
         user_balance.save()
 
     return user_balance
+
 
 def company_balance_create(*, debt_fund: float = 0, charity_fund: float = 0) -> CompanyBalance:
     company_balance_instance = company_balance_list()
@@ -203,3 +205,29 @@ def company_balance_create(*, debt_fund: float = 0, charity_fund: float = 0) -> 
         company_balance.save()
 
     return company_balance
+
+
+def user_money_expense_from_debt_fund(user, amount):
+    user_balance_instance = user_balance_list().filter(user=user)
+
+    if not user_balance_instance.exists():
+        raise ValidationError({"detail": "İstifadəçi balansı tapılmadı"})
+
+    user_balance = user_balance_instance.last()
+    company_balance = company_balance_list().last()
+
+    if not company_balance:
+        raise ValidationError({"detail": "Fond tapılmadı"})
+
+    if float(amount) > float(company_balance.debt_fund):
+        raise ValidationError({"detail": "Fondda yetəri qədər məbləğ yoxdur"})
+
+    if float(amount) > float(user_balance.money_in_debt_fund):
+        raise ValidationError({"detail": "Məbləği doğru daxil edin. Borc verdiyinizdən artıq məbləğ tələb edə bilməzsiniz!"})
+
+    user_balance.balance = float(user_balance.balance) + float(amount)
+    user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) - float(amount)
+    user_balance.save()
+
+    company_balance.debt_fund = float(company_balance.debt_fund) - float(amount)
+    company_balance.save()

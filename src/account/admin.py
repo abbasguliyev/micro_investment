@@ -14,18 +14,22 @@ class InvestorAdmin(admin.ModelAdmin):
     list_display = ('id', 'user')
     list_display_links = ('id', 'user')
 
+
 @admin.register(Experience)
 class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ('id', )
+    list_display = ('id',)
+
 
 @admin.register(Education)
 class EducationAdmin(admin.ModelAdmin):
-    list_display = ('id', )
+    list_display = ('id',)
+
 
 @admin.register(UserBalance)
 class UserBalanceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'balance')
+    list_display = ('id', 'user', 'balance', 'money_in_debt_fund')
     list_display_links = ('id', 'user')
+
 
 @admin.register(CompanyBalance)
 class CompanyBalanceAdmin(admin.ModelAdmin):

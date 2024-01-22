@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from django.db.models import Sum, Q
 from django.contrib.auth import get_user_model
 from account.models import Investor, Experience, Education, UserBalance, CompanyBalance
 from account.api.selectors import user_list, user_balance_list, investor_list
+from investment.api.selectors import investment_list, investment_report_list
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -29,6 +31,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class UserOutSerializer(serializers.ModelSerializer):
     balance = serializers.SerializerMethodField('get_balance')
+    money_in_debt_fund = serializers.SerializerMethodField('get_money_in_debt_fund')
 
     def get_balance(self, instance):
         balance_list = user_balance_list().filter(user=instance).last()
@@ -37,9 +40,17 @@ class UserOutSerializer(serializers.ModelSerializer):
         else:
             return 0
 
+    def get_money_in_debt_fund(self, instance):
+        balance_list = user_balance_list().filter(user=instance).last()
+        if balance_list is not None:
+            return balance_list.money_in_debt_fund
+        else:
+            return 0
+
     class Meta:
         model = get_user_model()
-        fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance']
+        fields = ['id', 'first_name', 'last_name', 'email', 'is_staff', 'is_active', 'is_superuser', 'balance', 'money_in_debt_fund']
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
@@ -114,13 +125,63 @@ class InvestorOutSerializer(serializers.ModelSerializer):
     user = UserOutSerializer(read_only=True)
     references = UserOutSerializer(read_only=True, many=True)
 
+    own_investment = serializers.SerializerMethodField()
+    investment_count = serializers.SerializerMethodField()
+    money_given_to_a_debt_fund_count = serializers.SerializerMethodField()
+    money_given_to_a_charity_fund_count = serializers.SerializerMethodField()
+
+    def get_investment_count(self, instance):
+        result = investment_list().filter(investor=instance.id).aggregate(
+            total_amount=Sum('amount', filter=Q(investor=instance))
+        )
+        total_amount = result.get('total_amount')
+        if total_amount is None:
+            total_amount = 0
+
+        total_amount = "%.2f" % total_amount
+        return total_amount
+
+    def get_own_investment(self, instance):
+        result = investment_list().filter(investor=instance, is_amount_sended=True).aggregate(
+            total_own_investment=Sum('amount_must_send', filter=Q(investor=instance, is_amount_sended=True))
+        )
+        total_own_investment = result.get('total_own_investment')
+        if total_own_investment is None:
+            total_own_investment = 0
+
+        total_own_investment = "%.2f" % total_own_investment
+        return total_own_investment
+
+    def get_money_given_to_a_debt_fund_count(self, instance):
+        result = investment_report_list().filter(investor=instance).aggregate(
+            total_amount_want_to_send_to_debt_fund=Sum('amount_want_to_send_to_debt_fund', filter=Q(investor=instance))
+        )
+        total_amount_want_to_send_to_debt_fund = result.get('total_amount_want_to_send_to_debt_fund')
+        if total_amount_want_to_send_to_debt_fund is None:
+            total_amount_want_to_send_to_debt_fund = 0
+
+        total_amount_want_to_send_to_debt_fund = "%.2f" % total_amount_want_to_send_to_debt_fund
+        return total_amount_want_to_send_to_debt_fund
+
+    def get_money_given_to_a_charity_fund_count(self, instance):
+        result = investment_report_list().filter(investor=instance).aggregate(
+            total_amount_want_to_send_to_charity_fund=Sum('amount_want_to_send_to_charity_fund', filter=Q(investor=instance))
+        )
+        total_amount_want_to_send_to_charity_fund = result.get('total_amount_want_to_send_to_charity_fund')
+        if total_amount_want_to_send_to_charity_fund is None:
+            total_amount_want_to_send_to_charity_fund = 0
+
+        total_amount_want_to_send_to_charity_fund = "%.2f" % total_amount_want_to_send_to_charity_fund
+        return total_amount_want_to_send_to_charity_fund
+
     class Meta:
         model = Investor
         fields = [
             'id', 'user', 'birthdate', 'address', 'marital_status', 'employment_status',
             'housing_status', 'phone_number', 'credit_cart_number', 'debt_amount',
             'monthly_income', 'references', 'profile_picture', 'about',
-            'business_activities'
+            'business_activities', 'investment_count', 'own_investment', 'money_given_to_a_debt_fund_count',
+            'money_given_to_a_charity_fund_count'
         ]
 
 
@@ -213,9 +274,17 @@ class EducationOutSerializer(serializers.ModelSerializer):
 class UserBalanceOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserBalance
-        fields = ['id', 'user', 'balance']
+        fields = ['id', 'user', 'balance', 'money_in_debt_fund']
+
 
 class CompanyBalanceOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyBalance
         fields = ['id', 'debt_fund', 'charity_fund']
+
+
+class DebtFundExpenseSerializer(serializers.Serializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=user_list(), write_only=True
+    )
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)

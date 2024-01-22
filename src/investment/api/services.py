@@ -9,12 +9,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def investment_create(
         *, request_user, investor,
         entrepreneur,
         amount: float,
         is_submitted: bool = False,
-        is_from_debt_fund: bool = False, 
+        is_from_debt_fund: bool = False,
         amount_from_debt_fund: float = 0
 ) -> Investment:
     if amount <= 0:
@@ -26,7 +27,7 @@ def investment_create(
     has_investment = investment_list().filter(investor=investor, entrepreneur=entrepreneur).exists()
     if has_investment:
         raise ValidationError({"detail": _("Eyni sifarişə yalnız 1 dəfə yatırım edə bilərsiniz")})
-    
+
     if is_from_debt_fund == True:
         if float(amount_from_debt_fund) > float(amount):
             raise ValidationError({"detail": _("Borc fondundan qarşılanacaq məbləğ yekun məbləğdən çox ola bilməz")})
@@ -62,7 +63,7 @@ def investment_update(instance, **data) -> Investment:
     amount = instance.amount
     if data.get("is_submitted") is not None and instance.is_submitted == data.get("is_submitted"):
         raise ValidationError({"detail": _("Məlumatları doğru daxil edin")})
-    if data.get("amount") is not None and  instance.is_submitted is False:
+    if data.get("amount") is not None and instance.is_submitted is False:
         amount = data.get("amount")
         if amount <= 0:
             raise ValidationError({"detail": _("Məbləğ 0-dan böyük olmalıdır!")})
@@ -74,10 +75,10 @@ def investment_update(instance, **data) -> Investment:
         final_profit = float(amount) + float(profit)
         data['profit'] = profit
         data['final_profit'] = final_profit
-        
 
-        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyada dəyişiklik edildi, zəhmət olmasa profilinizə nəzər yetirin")
-    
+        notification_create(user=instance.investor.user,
+                            message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyada dəyişiklik edildi, zəhmət olmasa profilinizə nəzər yetirin")
+
     if data.get("is_submitted") is not None and instance.is_submitted is False and data.get("is_submitted") is True:
         user_balance = user_balance_list().filter(user=instance.investor.user).last()
         company_balance = company_balance_list().last()
@@ -126,7 +127,7 @@ def investment_update(instance, **data) -> Investment:
                 instance.amount_must_send = 0
                 instance.amount_deducated_from_balance = 0
                 instance.save()
-        elif instance.is_from_debt_fund == True: 
+        elif instance.is_from_debt_fund == True:
             if data.get('amount_from_debt_fund') is not None:
                 amount_from_debt = data.get('amount_from_debt_fund')
             else:
@@ -197,7 +198,7 @@ def investment_update(instance, **data) -> Investment:
         instance.entrepreneur.amount_collected = float(instance.entrepreneur.amount_collected) + float(amount)
         instance.entrepreneur.save()
         notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiya təsdiq edildi")
-        
+
     if data.get("is_submitted") is not None and instance.is_submitted is True and data.get("is_submitted") is False:
         instance.entrepreneur.amount_collected = instance.entrepreneur.amount_collected - instance.amount
         instance.entrepreneur.save()
@@ -215,11 +216,13 @@ def investment_update(instance, **data) -> Investment:
         instance.save()
         data['amount'] = instance.amount
 
-        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
+        notification_create(user=instance.investor.user,
+                            message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
 
     investment = investment_list().filter(pk=instance.pk).update(**data)
-    
+
     return investment
+
 
 def investment_delete(instance):
     if instance.is_submitted == True:
@@ -239,9 +242,11 @@ def investment_delete(instance):
         instance.amount_deducated_from_balance = 0
         instance.save()
 
-        notification_create(user=instance.investor.user, message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
+        notification_create(user=instance.investor.user,
+                            message=f"{instance.entrepreneur.project_name} sifarişinə etdiyiniz investisiyanın təsqilənməsi admin tərəfindən geri çəkildi")
 
     instance.delete()
+
 
 def investment_report_create(
         *, request_user,
@@ -258,34 +263,28 @@ def investment_report_create(
         raise ValidationError({'detail': _('Başqa investorun investisiya hesabatını edə bilməzsiniz')})
 
     if investment.is_from_debt_fund == True:
-        print("Burdayam")
         company_balance.debt_fund = float(company_balance.debt_fund) + float(investment.amount_from_debt_fund)
         company_balance.save()
         amount_want_to_send_to_debt_fund = 0
         # amount_want_to_send_to_charity_fund = 0
         investment.final_profit = float(investment.final_profit) - float(investment.amount_from_debt_fund)
 
-    print(f"{amount_want_to_send_to_cart=}")
-    print(f"{amount_want_to_keep_in_the_balance=}")
-    print(f"{amount_want_to_send_to_charity_fund=}")
-    print(f"{amount_want_to_send_to_debt_fund=}")
-    total_amount = float(amount_want_to_send_to_cart) + float(amount_want_to_keep_in_the_balance) + float(amount_want_to_send_to_charity_fund) + float(amount_want_to_send_to_debt_fund)
-    print(f"{total_amount=}")
+    total_amount = float(amount_want_to_send_to_cart) + float(amount_want_to_keep_in_the_balance) + float(amount_want_to_send_to_charity_fund) + float(
+        amount_want_to_send_to_debt_fund)
 
     total_amount = float("{:.2f}".format(total_amount))
     final_profit = float("{:.2f}".format(investment.final_profit))
 
-    print(f"{total_amount=}")
-    print(f"{final_profit=}")
-
-    if (amount_want_to_send_to_cart == 0 and amount_want_to_keep_in_the_balance == 0 and amount_want_to_send_to_charity_fund == 0 and amount_want_to_send_to_debt_fund == 0) and (float(total_amount) != float(final_profit)):
+    if (
+            amount_want_to_send_to_cart == 0 and amount_want_to_keep_in_the_balance == 0 and amount_want_to_send_to_charity_fund == 0 and amount_want_to_send_to_debt_fund == 0) and (
+            float(total_amount) != float(final_profit)):
         logger.error('Bütün məbləğlər 0 daxil edilib')
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
 
     if float(total_amount) != float(final_profit):
         logger.error('Yazılan məbləğlər ümumi gəlirə bərabər deyil')
         raise ValidationError({'detail': _('Məbləğləri doğru daxil edin')})
-    
+
     investment_report_is_exists = investment_report_list().filter(investor=investor, investment=investment)
 
     if investment_report_is_exists.exists():
@@ -302,6 +301,7 @@ def investment_report_create(
 
         user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
         user_balance.balance = float(user_balance.balance) - float(investment_report.amount_want_to_keep_in_the_balance)
+        user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) - float(investment_report.amount_want_to_send_to_debt_fund)
         user_balance.save()
 
         investment_report.investor = investor
@@ -312,12 +312,13 @@ def investment_report_create(
         investment_report.amount_want_to_send_to_debt_fund = amount_want_to_send_to_debt_fund
         investment_report.note = note
         investment_report.save()
-        
+
         company_balance.debt_fund = float(company_balance.debt_fund) + float(amount_want_to_send_to_debt_fund)
         company_balance.charity_fund = float(company_balance.charity_fund) + float(amount_want_to_send_to_charity_fund)
         company_balance.save()
 
         user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
+        user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) + float(amount_want_to_send_to_debt_fund)
         user_balance.save()
 
     else:
@@ -334,8 +335,9 @@ def investment_report_create(
 
         user_balance = user_balance_list().filter(user=investment_report.investor.user).last()
         user_balance.balance = float(user_balance.balance) + float(amount_want_to_keep_in_the_balance)
+        user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) + float(amount_want_to_send_to_debt_fund)
         user_balance.save()
-    
+
     return investment_report
 
 

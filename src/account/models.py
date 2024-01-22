@@ -71,9 +71,10 @@ class Investor(models.Model):
     debt_amount = models.DecimalField(_("Debt Amount"), max_digits=10, decimal_places=2, default=0)
     monthly_income = models.DecimalField(_("Monthly Income"), max_digits=10, decimal_places=2, default=0)
     references = models.ManyToManyField(User, related_name="investors", verbose_name=_("References"), blank=True)
-    profile_picture = models.ImageField(_("Profile Picture"), max_length=1000, upload_to="investor/profile_pictures/", null=True, blank=True, validators=[FileExtensionValidator(['png',
-                                                                                                                                                                 'jpeg',
-                                                                                                                                                                 'jpg'])])
+    profile_picture = models.ImageField(_("Profile Picture"), max_length=1000, upload_to="investor/profile_pictures/", null=True, blank=True,
+                                        validators=[FileExtensionValidator(['png',
+                                                                            'jpeg',
+                                                                            'jpg'])])
     about = models.TextField(_("about"), null=True, blank=True)
     business_activities = models.TextField(_("Business Activities"), null=True, blank=True)
 
@@ -111,6 +112,8 @@ class Experience(models.Model):
 class UserBalance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="balance")
     balance = models.DecimalField(_("balance"), max_digits=10, decimal_places=2, default=0)
+    money_in_debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
 
 class CompanyBalance(models.Model):
     debt_fund = models.DecimalField(max_digits=10, decimal_places=2, default=0)

@@ -1,9 +1,11 @@
+from django.db.models import Sum, Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import user_logged_in
 
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
-from rest_framework.views import Response
+from rest_framework.views import Response, APIView
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -12,16 +14,19 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 from account.api import serializers, selectors, services, utils, filters
+from account.api.serializers import DebtFundExpenseSerializer
 
+from investment.api.selectors import investment_report_list
 
 class LoginView(TokenObtainPairView):
     class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         default_error_messages = {
             'no_active_account': _('Hesabı təsdiqlənmiş istifadəçi tapılmadı')
         }
+
     permission_classes = (permissions.AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
-    
+
     def post(self, request, *args, **kwargs) -> Response:
         data = super().post(request, *args, **kwargs)
 
@@ -74,7 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
         investor = selectors.investor_list().filter(user=user).last()
         serializers = self.get_serializer(investor)
         return Response(serializers.data)
-    
+
     @action(methods=["POST"], detail=False, serializer_class=serializers.ChangePasswordSerializer, url_path="change-password")
     def change_password(self, request, *args, **kwargs):
         user = request.user
@@ -87,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
             user.set_password(serializer.data.get("new_password"))
             user.save()
         return Response(data={'detail': _("Şifrə yeniləndi")}, status=status.HTTP_200_OK)
-    
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         user = instance.user
@@ -170,3 +175,38 @@ class CompanyBalanceViewSet(viewsets.ModelViewSet):
         services.company_balance_create(**serializer.validated_data)
         headers = self.get_success_headers(serializer.data)
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class DebtFundExpenseView(APIView):
+    """
+    parameters:
+    - user: int
+    - amount: float
+    """
+    def post(self, request, *args, **kwargs):
+        serializer = DebtFundExpenseSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.user_money_expense_from_debt_fund(**serializer.validated_data)
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED)
+
+
+class DebtFundAddToUserBalanceView(APIView):
+    """
+    İnvestorun borc fonduna verdiyi bütün məbləğləri profilinə atmaq üçün
+    """
+    def post(self, request, *args, **kwargs):
+        users = selectors.user_list()
+        for user in users:
+            user_balance = selectors.user_balance_list().filter(user=user).last()
+            investor = selectors.investor_list().filter(user=user).last()
+            if user_balance and investor:
+                result = investment_report_list().filter(investor=investor).aggregate(
+                    total_amount_want_to_send_to_debt_fund=Sum('amount_want_to_send_to_debt_fund', filter=Q(investor=investor))
+                )
+                total_amount_want_to_send_to_debt_fund = result.get('total_amount_want_to_send_to_debt_fund')
+                print(f"{total_amount_want_to_send_to_debt_fund=}")
+                if total_amount_want_to_send_to_debt_fund is None:
+                    total_amount_want_to_send_to_debt_fund = 0
+                user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) + float(total_amount_want_to_send_to_debt_fund)
+                user_balance.save()
+        return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_201_CREATED)
