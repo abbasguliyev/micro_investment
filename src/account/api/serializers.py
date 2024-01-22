@@ -127,6 +127,7 @@ class InvestorOutSerializer(serializers.ModelSerializer):
 
     own_investment = serializers.SerializerMethodField()
     investment_count = serializers.SerializerMethodField()
+    profit_earned = serializers.SerializerMethodField()
     money_given_to_a_debt_fund_count = serializers.SerializerMethodField()
     money_given_to_a_charity_fund_count = serializers.SerializerMethodField()
 
@@ -140,10 +141,21 @@ class InvestorOutSerializer(serializers.ModelSerializer):
 
         total_amount = "%.2f" % total_amount
         return total_amount
+    
+    def get_profit_earned(self, instance):
+        result = investment_list().filter(investor=instance.id).aggregate(
+            total_profit=Sum('profit', filter=Q(investor=instance))
+        )
+        total_profit = result.get('total_profit')
+        if total_profit is None:
+            total_profit = 0
+
+        total_profit = "%.2f" % total_profit
+        return total_profit
 
     def get_own_investment(self, instance):
-        result = investment_list().filter(investor=instance, is_amount_sended=True).aggregate(
-            total_own_investment=Sum('amount_must_send', filter=Q(investor=instance, is_amount_sended=True))
+        result = investment_list().filter(investor=instance.id, is_amount_sended=True).aggregate(
+            total_own_investment=Sum('amount_must_send', filter=Q(investor=instance.id, is_amount_sended=True))
         )
         total_own_investment = result.get('total_own_investment')
         if total_own_investment is None:
@@ -153,8 +165,8 @@ class InvestorOutSerializer(serializers.ModelSerializer):
         return total_own_investment
 
     def get_money_given_to_a_debt_fund_count(self, instance):
-        result = investment_report_list().filter(investor=instance).aggregate(
-            total_amount_want_to_send_to_debt_fund=Sum('amount_want_to_send_to_debt_fund', filter=Q(investor=instance))
+        result = investment_report_list().filter(investor=instance.id).aggregate(
+            total_amount_want_to_send_to_debt_fund=Sum('amount_want_to_send_to_debt_fund', filter=Q(investor=instance.id))
         )
         total_amount_want_to_send_to_debt_fund = result.get('total_amount_want_to_send_to_debt_fund')
         if total_amount_want_to_send_to_debt_fund is None:
@@ -164,8 +176,8 @@ class InvestorOutSerializer(serializers.ModelSerializer):
         return total_amount_want_to_send_to_debt_fund
 
     def get_money_given_to_a_charity_fund_count(self, instance):
-        result = investment_report_list().filter(investor=instance).aggregate(
-            total_amount_want_to_send_to_charity_fund=Sum('amount_want_to_send_to_charity_fund', filter=Q(investor=instance))
+        result = investment_report_list().filter(investor=instance.id).aggregate(
+            total_amount_want_to_send_to_charity_fund=Sum('amount_want_to_send_to_charity_fund', filter=Q(investor=instance.id))
         )
         total_amount_want_to_send_to_charity_fund = result.get('total_amount_want_to_send_to_charity_fund')
         if total_amount_want_to_send_to_charity_fund is None:
@@ -181,7 +193,7 @@ class InvestorOutSerializer(serializers.ModelSerializer):
             'housing_status', 'phone_number', 'credit_cart_number', 'debt_amount',
             'monthly_income', 'references', 'profile_picture', 'about',
             'business_activities', 'investment_count', 'own_investment', 'money_given_to_a_debt_fund_count',
-            'money_given_to_a_charity_fund_count'
+            'money_given_to_a_charity_fund_count', 'profit_earned'
         ]
 
 
