@@ -13,7 +13,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name="login"),
     path('refresh/', jwt_views.TokenRefreshView.as_view(), name="token_refresh"),
     path('debt-fund-expense/', DebtFundExpenseView.as_view(), name='debt_fund_expense'),
-    path('debt-fund-add-to-user-balance/', DebtFundAddToUserBalanceView.as_view(), name='debt_fund_add_to_user_balance'),
+    # path('debt-fund-add-to-user-balance/', DebtFundAddToUserBalanceView.as_view(), name='debt_fund_add_to_user_balance'),
     path('password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('', include(router.urls)),
 ]
