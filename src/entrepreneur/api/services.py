@@ -6,22 +6,24 @@ from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list, entrepreneur_images_list
 from micro_investment.validators import compress
 from notification.api.services import notification_create
+from account.api.selectors import company_balance_list
+
 
 def entrepreneur_create(
-    *, owner,
-    project_name: str,
-    start_date,
-    end_date,
-    description: str,
-    count: int = 1,
-    purchase_price: float,
-    sale_price: float,
-    platform_cost_percentage: int = 0,
-    investor_share_percentage: int = 0,
-    entrepreneur_share_percentage: int = 0,
-    debt_to_the_fund_percentage: int = 0,
-    charity_to_the_fund_percentage: int = 0
-    
+        *, owner,
+        project_name: str,
+        start_date,
+        end_date,
+        description: str,
+        count: int = 1,
+        purchase_price: float,
+        sale_price: float,
+        platform_cost_percentage: int = 0,
+        investor_share_percentage: int = 0,
+        entrepreneur_share_percentage: int = 0,
+        debt_to_the_fund_percentage: int = 0,
+        charity_to_the_fund_percentage: int = 0
+
 ) -> Entrepreneur:
     if owner.user.is_superuser == True or owner.user.is_staff == True:
         is_active = True
@@ -45,6 +47,11 @@ def entrepreneur_create(
     charity_to_the_fund = "%.2f" % charity_to_the_fund
     profit_ratio = float("%.2f" % profit_ratio)
 
+    company_balance = company_balance_list().last()
+    company_balance.debt_fund = float(company_balance.debt_fund) + float(debt_to_the_fund)
+    company_balance.charity_fund = float(company_balance.charity_fund) + float(charity_to_the_fund)
+    company_balance.save()
+
     entrepreneur = Entrepreneur.objects.create(
         owner=owner, project_name=project_name, start_date=start_date, end_date=end_date, description=description,
         count=count, purchase_price=purchase_price, sale_price=sale_price,
@@ -58,6 +65,7 @@ def entrepreneur_create(
     entrepreneur.save()
 
     return entrepreneur
+
 
 def entrepreneur_update(instance, **data) -> Entrepreneur:
     if data.get("is_finished") is not None and instance.is_finished == False and data.get("is_finished") == True:
@@ -122,7 +130,7 @@ def entrepreneur_update(instance, **data) -> Entrepreneur:
     #     data["total_investment"] = total_investment
     # else:
     #     data["total_investment"] = instance.total_investment
-    
+
     # if data.get('gross_income') is None:
     #     data["gross_income"] = gross_income
     # else:
@@ -132,27 +140,27 @@ def entrepreneur_update(instance, **data) -> Entrepreneur:
     #     data["platform_cost"] = platform_cost
     # else:
     #     data["platform_cost"] = instance.platform_cost
-    
+
     # if data.get('final_profit') is None:
     #     data["final_profit"] = final_profit
     # else:
     #     data["final_profit"] = instance.final_profit
-    
+
     # if data.get('investor_share') is None:
     #     data["investor_share"] = investor_share
     # else:
     #     data["investor_share"] = instance.investor_share
-    
+
     # if data.get('entrepreneur_share') is None:
     #     data["entrepreneur_share"] = entrepreneur_share
     # else:
     #     data["entrepreneur_share"] = instance.entrepreneur_share
-    
+
     # if data.get('debt_to_the_fund') is None:
     #     data["debt_to_the_fund"] = debt_to_the_fund
     # else:
     #     data["debt_to_the_fund"] = instance.debt_to_the_fund
-    
+
     # if data.get('charity_to_the_fund') is None:
     #     data["charity_to_the_fund"] = charity_to_the_fund
     # else:
@@ -163,12 +171,31 @@ def entrepreneur_update(instance, **data) -> Entrepreneur:
     # else:
     #     data["profit_ratio"] = instance.profit_ratio
 
+    if data.get('debt_to_the_fund') is not None:
+        company_balance = company_balance_list().last()
+        company_balance.debt_fund = float(company_balance.debt_fund) - float(instance.debt_to_the_fund)
+        company_balance.save()
+
+        company_balance.debt_fund = float(company_balance.debt_fund) + float(data.get('debt_to_the_fund'))
+        company_balance.save()
+
+    print(f"{data=}")
+
+    if data.get('charity_to_the_fund') is not None:
+        company_balance = company_balance_list().last()
+        company_balance.charity_fund = float(company_balance.charity_fund) - float(instance.charity_to_the_fund)
+        company_balance.save()
+
+        company_balance.charity_fund = float(company_balance.charity_fund) + float(data.get('charity_to_the_fund'))
+        company_balance.save()
+
     entrepreneur = entrepreneur_list().filter(pk=instance.pk).update(**data)
     return entrepreneur
 
+
 def entrepreneur_images_create(
-    *,  entrepreneur,
-    image: str
+        *, entrepreneur,
+        image: str
 ) -> EntrepreneurImages:
     if image is not None:
         compressed_image = compress(image)
@@ -179,6 +206,7 @@ def entrepreneur_images_create(
     entrepreneur_image.save()
 
     return entrepreneur_image
+
 
 def entrepreneur_images_update(instance, **data) -> EntrepreneurImages:
     entrepreneur_image = entrepreneur_images_list().filter(pk=instance.pk).update(**data)

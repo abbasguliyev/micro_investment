@@ -216,6 +216,9 @@ def user_money_expense_from_debt_fund(user, amount):
     user_balance = user_balance_instance.last()
     company_balance = company_balance_list().last()
 
+    print(f"{amount=}")
+    print(f"{user_balance.money_in_debt_fund=}")
+
     if not company_balance:
         raise ValidationError({"detail": "Fond tapılmadı"})
 
