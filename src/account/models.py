@@ -85,6 +85,9 @@ class Investor(models.Model):
 
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 class Education(models.Model):
     user = models.ForeignKey(Investor, on_delete=models.CASCADE, related_name='education')
