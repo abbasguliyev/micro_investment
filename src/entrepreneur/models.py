@@ -42,6 +42,9 @@ class Entrepreneur(models.Model):
 
     amount_collected = models.DecimalField(_("Amount collected"), max_digits=10, decimal_places=2, default=0)
 
+    def __str__(self):
+        return self.project_name
+
 
 class EntrepreneurImages(models.Model):
     entrepreneur = models.ForeignKey(Entrepreneur, on_delete=models.CASCADE, related_name="images")

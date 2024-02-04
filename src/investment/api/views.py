@@ -46,6 +46,14 @@ class InvestmentViewSet(viewsets.ModelViewSet):
         return Response(data={'detail': _("Əməliyyat yerinə yetirildi")}, status=status.HTTP_204_NO_CONTENT)
 
 
+class AdminInvestmentViewSet(viewsets.ModelViewSet):
+    queryset = selectors.admin_investment_list()
+    serializer_class = serializers.InvestmentOutSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = filters.InvestmentFilter
+    pagination_class = None
+
+
 class InvestmentReportViewSet(viewsets.ModelViewSet):
     queryset = selectors.investment_report_list()
     serializer_class = serializers.InvestmentReportOutSerializer
