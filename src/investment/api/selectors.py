@@ -3,7 +3,7 @@ from investment.models import Investment, InvestmentReport
 
 
 def investment_list() -> QuerySet[Investment]:
-    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("-investment_date").all()
+    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("entrepreneur__project_name").all()
     return qs
 
 
