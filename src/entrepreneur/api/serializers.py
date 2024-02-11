@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from rest_framework import serializers
 from entrepreneur.models import Entrepreneur, EntrepreneurImages
 from entrepreneur.api.selectors import entrepreneur_list
-from account.api.serializers import InvestorOutSerializer
 from account.api.selectors import user_balance_list
 from account.models import Investor
-from investment.models import Investment, InvestmentReport
+from investment.api.selectors import investment_report_list
 
 
 class EntrepreneurCreateSerializer(serializers.ModelSerializer):
@@ -36,11 +36,11 @@ class EntrepreneurUpdateSerializer(serializers.ModelSerializer):
         model = Entrepreneur
         fields = [
             'project_name', 'start_date', 'end_date', 'description',
-            'count', 'purchase_price', 'sale_price', 'total_investment', 
-            'gross_income', 'platform_cost_percentage', 'platform_cost', 'final_profit', 
+            'count', 'purchase_price', 'sale_price', 'total_investment',
+            'gross_income', 'platform_cost_percentage', 'platform_cost', 'final_profit',
             'investor_share_percentage', 'investor_share', 'entrepreneur_share_percentage', 'entrepreneur_share',
             'debt_to_the_fund_percentage', 'debt_to_the_fund',
-            'charity_to_the_fund_percentage', 'charity_to_the_fund', 'profit_ratio', 
+            'charity_to_the_fund_percentage', 'charity_to_the_fund', 'profit_ratio',
             'is_active', 'finished_date', 'amount_collected', 'is_finished'
         ]
         extra_kwargs = {
@@ -90,45 +90,19 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
                 'id', 'user'
             ]
 
-    # class InvestmentNestedSerializer(serializers.ModelSerializer):
-    #     class InvestmentInvestorInlineSerializer(serializers.ModelSerializer):
-    #         class InvestmentInvestorUserInlineSerializer(serializers.ModelSerializer):
-    #             balance = serializers.SerializerMethodField('get_balance')
-
-    #             def get_balance(self, instance):
-    #                 balance_list = user_balance_list().filter(user=instance).last()
-    #                 if balance_list is not None:
-    #                     return balance_list.balance
-    #                 else:
-    #                     return 0
-                    
-    #             class Meta:
-    #                 model = get_user_model()
-    #                 fields = ['id', 'first_name', 'last_name', 'balance']
-
-    #         user = InvestmentInvestorUserInlineSerializer()
-
-    #         class Meta:
-    #             model = Investor
-    #             fields = ['id', 'user']
-
-    #     class InvestmentReportInlineSerializer(serializers.ModelSerializer):
-    #         class Meta:
-    #             model = InvestmentReport
-    #             fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',
-    #                       'amount_want_to_send_to_debt_fund', 'note']
-
-    #     investor = InvestmentInvestorInlineSerializer()
-    #     investment_report = InvestmentReportInlineSerializer(many=True)
-
-    #     class Meta:
-    #         model = Investment
-    #         fields = ['id', 'investor', 'entrepreneur', 'amount', 'amount_must_send', 'amount_deducated_from_balance', 'profit', 'final_profit', 'investment_date',
-    #                   'is_submitted', 'investment_report']
-
     owner = InlineEntrepreneurOwnerSerializer()
     images = EntrepreneurNestedImagesSerializer(many=True)
-    # investments = InvestmentNestedSerializer(many=True)
+
+    total_charity_money = serializers.SerializerMethodField('get_total_charity_money')
+
+    def get_total_charity_money(self, instance):
+        investment_reports = investment_report_list().filter(investment__entrepreneur=instance)
+        print(f"{investment_reports=}")
+        if len(investment_reports) > 0:
+            total_charity_money = investment_reports.aggregate(total_charity_money=Sum('amount_want_to_send_to_charity_fund'))
+            return total_charity_money.get('total_charity_money')
+        else:
+            return 0
 
     class Meta:
         model = Entrepreneur
@@ -139,7 +113,7 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
             'platform_cost', 'final_profit', 'investor_share_percentage', 'investor_share',
             'entrepreneur_share_percentage', 'entrepreneur_share',
             'debt_to_the_fund_percentage', 'debt_to_the_fund', 'charity_to_the_fund_percentage', 'charity_to_the_fund',
-            'profit_ratio', 'amount_collected', 'images', 'investments', 'is_finished'
+            'profit_ratio', 'amount_collected', 'images', 'investments', 'is_finished', 'total_charity_money'
         ]
 
 

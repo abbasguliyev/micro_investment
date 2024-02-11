@@ -217,6 +217,7 @@ def user_money_expense_from_debt_fund(user, amount):
     company_balance = company_balance_list().last()
 
     print(f"{amount=}")
+    print(f"{user_balance=}")
     print(f"{user_balance.money_in_debt_fund=}")
 
     if not company_balance:

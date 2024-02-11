@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 from rest_framework import serializers
 from investment.models import Investment, InvestmentReport
 from account.models import Investor
@@ -54,7 +55,7 @@ class InvestmentOutSerializer(serializers.ModelSerializer):
                     return balance_list.balance
                 else:
                     return 0
-                
+
             class Meta:
                 model = get_user_model()
                 fields = ['id', 'first_name', 'last_name', 'balance']
@@ -101,7 +102,6 @@ class InvestmentReportCreateSerializer(serializers.ModelSerializer):
 
 
 class InvestmentReportUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = InvestmentReport
         fields = ['is_amount_sended_to_investor']
@@ -121,7 +121,7 @@ class InvestmentReportOutSerializer(serializers.ModelSerializer):
                     return balance_list.balance
                 else:
                     return 0
-                
+
             class Meta:
                 model = get_user_model()
                 fields = ['id', 'first_name', 'last_name', 'balance']
@@ -131,7 +131,9 @@ class InvestmentReportOutSerializer(serializers.ModelSerializer):
         class Meta:
             model = Investor
             fields = ['id', 'user', 'credit_cart_number']
+
     investor = InvestmentReportInvestorInlineSerializer()
+
     class Meta:
         model = InvestmentReport
         fields = ['id', 'investor', 'investment', 'amount_want_to_send_to_cart', 'amount_want_to_keep_in_the_balance', 'amount_want_to_send_to_charity_fund',

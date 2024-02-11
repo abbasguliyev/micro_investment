@@ -16,6 +16,7 @@ class InvestmentFilter(django_filters.FilterSet):
             'investor': ['exact'],
             'entrepreneur': ['exact'],
             'entrepreneur__project_name': ['icontains'],
+            'entrepreneur__is_finished': ['exact'],
             'investment_date': ['exact'],
             'is_submitted': ['exact'],
             'is_amount_sended': ['exact'],
