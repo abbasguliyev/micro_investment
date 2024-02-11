@@ -141,7 +141,7 @@ class InvestorOutSerializer(serializers.ModelSerializer):
 
         total_amount = "%.2f" % total_amount
         return total_amount
-    
+
     def get_profit_earned(self, instance):
         result = investment_list().filter(investor=instance.id).aggregate(
             total_profit=Sum('profit', filter=Q(investor=instance))
@@ -290,9 +290,19 @@ class UserBalanceOutSerializer(serializers.ModelSerializer):
 
 
 class CompanyBalanceOutSerializer(serializers.ModelSerializer):
+    total_fund_money = serializers.SerializerMethodField('get_total_fund_money')
+
+    def get_total_fund_money(self, instance):
+        investments = investment_list().filter(is_from_debt_fund=True, entrepreneur__is_finished=False)
+        if len(investments) > 0:
+            total_fund_money = investments.aggregate(total_fund_money=Sum('amount_from_debt_fund'))
+            return total_fund_money.get('total_fund_money')
+        else:
+            return 0
+
     class Meta:
         model = CompanyBalance
-        fields = ['id', 'debt_fund', 'charity_fund']
+        fields = ['id', 'debt_fund', 'charity_fund', 'total_fund_money']
 
 
 class DebtFundExpenseSerializer(serializers.Serializer):
