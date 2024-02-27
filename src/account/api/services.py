@@ -72,7 +72,7 @@ def investor_create(
 
     if references is not None and references != []:
         investor.references.set(references.split(","))
-        investor.save
+        investor.save()
 
     return investor
 
