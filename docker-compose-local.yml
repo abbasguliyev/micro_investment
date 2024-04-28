@@ -56,7 +56,7 @@ services:
     networks:
       - micro-investment-network
     ports:
-      - "63081:6379"
+      - "63082:6379"
     env_file:
       - .env
     volumes:

@@ -3,7 +3,7 @@ from investment.models import Investment, InvestmentReport
 
 
 def investment_list() -> QuerySet[Investment]:
-    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("entrepreneur__project_name").all()
+    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("entrepreneur__project_name", "pk").all()
     return qs
 
 
@@ -13,5 +13,5 @@ def investment_report_list() -> QuerySet[InvestmentReport]:
 
 
 def admin_investment_list() -> QuerySet[Investment]:
-    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("investor__user__first_name").all()
+    qs = Investment.objects.select_related('investor', 'entrepreneur').order_by("investor__user__first_name", "pk").all()
     return qs
