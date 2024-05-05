@@ -97,7 +97,6 @@ class EntrepreneurOutSerializer(serializers.ModelSerializer):
 
     def get_total_charity_money(self, instance):
         investment_reports = investment_report_list().filter(investment__entrepreneur=instance)
-        print(f"{investment_reports=}")
         if len(investment_reports) > 0:
             total_charity_money = investment_reports.aggregate(total_charity_money=Sum('amount_want_to_send_to_charity_fund'))
             return total_charity_money.get('total_charity_money')

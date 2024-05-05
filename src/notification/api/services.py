@@ -23,6 +23,5 @@ def notification_update(instance, **data) -> Notification:
     return notification
 
 def notification_all_read(user) -> bool:
-    print(f"{user=}")
     transaction.on_commit(lambda: notification_all_read_task.delay(user.id))
     return True

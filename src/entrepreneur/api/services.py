@@ -179,8 +179,6 @@ def entrepreneur_update(instance, **data) -> Entrepreneur:
         company_balance.debt_fund = float(company_balance.debt_fund) + float(data.get('debt_to_the_fund'))
         company_balance.save()
 
-    print(f"{data=}")
-
     if data.get('charity_to_the_fund') is not None:
         company_balance = company_balance_list().last()
         company_balance.charity_fund = float(company_balance.charity_fund) - float(instance.charity_to_the_fund)

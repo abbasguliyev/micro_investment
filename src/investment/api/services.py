@@ -129,9 +129,15 @@ def investment_update(instance, **data) -> Investment:
                 instance.save()
         elif instance.is_from_debt_fund == True:
             if data.get('amount_from_debt_fund') is not None:
+                if data.get('is_from_debt_fund') == False:
+                    amount_from_debt = 0
+                    instance.amount_from_debt_fund = 0
+                    instance.save()
+                    data['amount_from_debt_fund'] = 0
                 amount_from_debt = data.get('amount_from_debt_fund')
             else:
                 amount_from_debt = instance.amount_from_debt_fund
+
 
             if float(amount_from_debt) > float(amount):
                 raise ValidationError({"detail": _("Borc fondundan qarşılanacaq məbləğ yekun məbləğdən çox ola bilməz")})

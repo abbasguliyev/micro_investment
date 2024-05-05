@@ -96,7 +96,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         user = instance.user
-        print(f"{user=}")
         self.perform_destroy(instance)
         selectors.user_list().filter(pk=user.id).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -204,7 +203,6 @@ class DebtFundAddToUserBalanceView(APIView):
                     total_amount_want_to_send_to_debt_fund=Sum('amount_want_to_send_to_debt_fund', filter=Q(investor=investor))
                 )
                 total_amount_want_to_send_to_debt_fund = result.get('total_amount_want_to_send_to_debt_fund')
-                print(f"{total_amount_want_to_send_to_debt_fund=}")
                 if total_amount_want_to_send_to_debt_fund is None:
                     total_amount_want_to_send_to_debt_fund = 0
                 user_balance.money_in_debt_fund = float(user_balance.money_in_debt_fund) + float(total_amount_want_to_send_to_debt_fund)

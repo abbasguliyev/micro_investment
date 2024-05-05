@@ -95,7 +95,6 @@ def investor_update(request_user, instance, **data) -> Investor:
             user_data["is_superuser"] = data.pop("is_superuser")
         else:
             raise ValidationError({"detail": _("Sizin buna səlahiyyətiniz yoxdur")})
-    print(f"{data=}")
     if data.get('profile_picture'):
         profile_picture = data.pop("profile_picture")
     else:
@@ -215,10 +214,6 @@ def user_money_expense_from_debt_fund(user, amount):
 
     user_balance = user_balance_instance.last()
     company_balance = company_balance_list().last()
-
-    print(f"{amount=}")
-    print(f"{user_balance=}")
-    print(f"{user_balance.money_in_debt_fund=}")
 
     if not company_balance:
         raise ValidationError({"detail": "Fond tapılmadı"})
